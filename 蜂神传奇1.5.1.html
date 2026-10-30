@@ -1,0 +1,2008 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>蜂神传奇 1.5.1Ver</title>
+<style>
+body{background:#0d0f14;color:#eee;font-family:"Microsoft YaHei",sans-serif;padding:10px;margin:0;-webkit-tap-highlight-color:transparent}
+h1{text-align:center;color:#ffd76a;font-size:24px;margin:10px 0 5px 0;letter-spacing:2px;text-shadow:0 0 10px rgba(255,180,60,.5)}
+.top-btns{text-align:center;margin-bottom:10px}
+.panel{background:#1a1a2e;border:1px solid #444;padding:10px;border-radius:6px;margin-bottom:10px}
+.btn{background:#4a3a8a;color:#fff;border:none;padding:8px 15px;margin:2px;border-radius:4px;cursor:pointer;font-size:13px}
+.btn.on{background:#ffb84d;color:#000;font-weight:bold}
+.btn:disabled{background:#333;color:#666;cursor:not-allowed}
+.pool{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.card-item{width:105px;background:#2a2a4a;border:2px solid #4a3a8a;border-radius:6px;padding:6px;cursor:pointer;text-align:center;position:relative;user-select:none}
+.card-item.sel{border-color:#ffd76a;box-shadow:0 0 10px #ffb84d}
+.card-item .icon{font-size:24px;height:30px;line-height:30px}
+.card-item .name{font-size:11px;font-weight:bold;margin-top:4px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.card-item .stats{font-size:10px;color:#aaa;margin-top:2px}
+.slots{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.slots select{background:#2a2a4a;color:#fff;border:1px solid #4a3a8a;padding:4px;border-radius:4px;width:110px}
+#log{background:rgba(0,0,0,0.8);height:120px;overflow-y:auto;font-size:12px;padding:8px;margin-top:10px;border:1px solid #333;color:#aaa;line-height:1.5;border-radius:6px;margin-bottom:80px;}
+#log div{border-bottom:1px solid #222;padding:2px 0}
+#log div:last-child{color:#ffd76a;border:none}
+#screenBattle{display:none}
+#actionPanel{display:none;background:rgba(26,26,46,0.95);border:1px solid #5aaaff;padding:10px;border-radius:6px;position:fixed;bottom:15px;left:10px;right:10px;max-width:600px;margin:0 auto;text-align:center;z-index:90;box-shadow:0 -4px 15px rgba(0,0,0,0.8);}
+#actionTitle{color:#ffd76a;font-size:14px;margin-bottom:8px;font-weight:bold}
+
+/* 弹窗系统 */
+#modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:100;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px;}
+#modalBox{background:#1a1a2e;border:2px solid #7a5fd0;padding:0;border-radius:8px;max-width:440px;width:100%;margin:20px auto;}
+#modalHeader{position:sticky;top:0;background:#1a1a2e;display:flex;justify-content:space-between;align-items:center;padding:10px 15px;border-bottom:1px solid #444;z-index:10;border-radius:6px 6px 0 0;}
+#modalHeader h2{color:#ffd76a;margin:0;font-size:18px;}
+#modalContent{padding:15px;}
+#modalContent .sec{background:#000;padding:8px;border-radius:4px;margin:8px 0;font-size:13px;line-height:1.6;color:#ccc;border:1px solid #333}
+#modalContent .status-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px}
+#modalContent .status-tag{background:#333;color:#fff;padding:2px 6px;border-radius:4px;font-size:11px}
+
+/* 留言板弹窗 */
+#msgModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:200;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px;}
+#msgBox{background:#1a1a2e;border:2px solid #ff9a3c;padding:0;border-radius:8px;max-width:500px;width:100%;margin:20px auto;}
+#msgHeader{position:sticky;top:0;background:#1a1a2e;display:flex;justify-content:space-between;align-items:center;padding:10px 15px;border-bottom:1px solid #444;z-index:10;border-radius:6px 6px 0 0;}
+#msgHeader h2{color:#ff9a3c;margin:0;font-size:20px;}
+#msgBody{padding:15px;}
+.author-msg{margin-bottom:20px;padding-bottom:15px;border-bottom:1px dashed #444}
+.author-msg:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
+.author-time{color:#5aaaff;font-size:13px;margin-bottom:6px;font-weight:bold}
+.author-content{font-size:14px;line-height:1.8;color:#ccc}
+
+#over{display:none;position:fixed;inset:0;background:rgba(10,5,25,.95);flex-direction:column;align-items:center;justify-content:center;z-index:300}
+#over h2{font-size:40px;color:#ffd76a;text-shadow:0 0 20px #ff9a3c;margin:0 0 20px 0;letter-spacing:4px}
+#over h2.lose{color:#ff6a8a;text-shadow:0 0 20px #c02040}
+.bigtext{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:36px;font-weight:900;color:#ffd76a;text-shadow:0 0 20px #ff9a3c;pointer-events:none;z-index:150;animation:bp 1.5s forwards;white-space:nowrap}
+@keyframes bp{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}30%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}80%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(1)}}
+
+.timeline-container{display:flex;overflow-x:auto;gap:4px;padding:4px;background:#0a0814;border-radius:6px;margin-bottom:5px;border:1px solid #333;}
+.tl-item{flex:0 0 auto;padding:4px 8px;border-radius:4px;font-size:12px;font-weight:bold;display:flex;align-items:center;gap:4px;background:#222}
+.tl-item.ally{border-left:3px solid #3adf6a}
+.tl-item.enemy{border-left:3px solid #ff5a5a}
+.tl-item.now{background:#444;box-shadow:0 0 10px #fff;transform:scale(1.05)}
+.debug-input{background:#2a2a4a;color:#fff;border:1px solid #4a3a8a;padding:6px;border-radius:4px;width:70px;text-align:center}
+
+/* ======== 全新战斗界面 UI ======== */
+#battlefield {
+    background: radial-gradient(circle at center, #182235 0%, #0a0e14 100%);
+    border: 3px solid #3a3a5c;
+    border-radius: 12px;
+    padding: 10px 5px;
+    box-shadow: inset 0 0 30px rgba(0,0,0,0.9), 0 0 15px rgba(90,170,255,0.1);
+    margin: 10px 0;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+/* 中间的魔法阵装饰线 */
+#battlefield::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 150%; height: 2px;
+    background: linear-gradient(90deg, transparent, #5aaaff, transparent);
+    transform: translate(-50%, -50%) rotate(-5deg);
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+.arena-row { 
+    display: flex; 
+    justify-content: center; 
+    gap: 8px; 
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    min-height: 130px; 
+    padding: 8px 0;
+    z-index: 1;
+}
+.arena-row::-webkit-scrollbar { display: none; }
+
+/* 新版卡牌 */
+.card-v2 {
+    width: 82px;
+    height: 120px;
+    background: linear-gradient(180deg, #2a2a4a 0%, #151525 100%);
+    border: 2px solid #555;
+    border-radius: 8px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    overflow: hidden;
+    user-select: none;
+    flex: 0 0 auto;
+}
+.card-v2.enemy { background: linear-gradient(180deg, #3a1a1a 0%, #151515 100%); }
+.card-v2.ally { background: linear-gradient(180deg, #1a3a2a 0%, #151525 100%); }
+.card-v2.dead { opacity: 0.3; filter: grayscale(1); }
+.card-v2.act { border-color: #ffd76a !important; box-shadow: 0 0 15px #ffb84d; transform: translateY(-5px); z-index: 10; }
+
+/* 能量满金光 */
+.card-v2.energy-full::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px #ffd76a, inset 0 0 10px #ffd76a;
+    animation: energyPulse 1s infinite alternate;
+    pointer-events: none;
+    z-index: 2;
+}
+@keyframes energyPulse {
+    0% { opacity: 0.3; }
+    100% { opacity: 1; }
+}
+
+/* 星级边框 */
+.star-1 { border-color: #fff !important; }
+.star-2 { border-color: #3adf6a !important; }
+.star-3 { border-color: #5aaaff !important; }
+.star-4 { border-color: #c77dff !important; }
+.star-5 { border-color: #ffd76a !important; }
+.star-6 { border-color: #00ffff !important; }
+.star-7 { border-color: #ff3a3a !important; }
+
+/* 伦海的启航者特写 */
+.card-v2.navigator {
+    border-color: #ffd700 !important;
+    animation: flashGold 1s infinite alternate;
+    transform: scale(1.2);
+    margin: 15px 0;
+    z-index: 10;
+}
+@keyframes flashGold {
+    0% { box-shadow: 0 0 15px #ffd700; }
+    100% { box-shadow: 0 0 35px #ffd700, inset 0 0 20px #ffd700; }
+}
+
+/* 立绘与文字 */
+.card-portrait { font-size: 32px; margin-top: 12px; height: 40px; line-height: 40px; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
+.card-title { font-size: 10px; color: #fff; text-align: center; margin-top: 2px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 90%; text-shadow: 0 1px 2px #000;}
+
+/* 底部血条与数值 */
+.card-bottom { position: absolute; bottom: 0; left: 0; width: 100%; height: 34px; background: rgba(0,0,0,0.7); display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 2px; border-top: 1px solid rgba(255,255,255,0.1);}
+.card-hp-bar { width: 96%; height: 4px; background: #500; border-radius: 2px; overflow: hidden; margin: 0 auto 1px auto; }
+.card-hp-fill { height: 100%; background: #3adf6a; }
+.card-stats { display: flex; justify-content: space-between; padding: 0 4px; font-size: 10px; font-weight: bold; }
+.card-atk { color: #ff9a3c; }
+.card-spd { color: #5aaaff; }
+.card-hp-text { position: absolute; width: 100%; text-align: center; font-size: 9px; color: #fff; bottom: 16px; font-weight: bold;}
+
+/* Buff 标签 */
+.card-buffs-v2 { position: absolute; top: 2px; left: 2px; display: flex; flex-direction: column; gap: 1px; align-items: flex-start; pointer-events: none; z-index: 3;}
+.buff-tag { font-size: 8px; background: rgba(0,0,0,0.8); padding: 1px 3px; border-radius: 3px; color: #c9b8ff; border: 1px solid #444; white-space: nowrap;}
+
+/* 阵营标签 */
+.arena-label { text-align: center; font-weight: bold; color: #ff5a5a; font-size: 13px; letter-spacing: 2px; margin-top: 5px; opacity: 0.8;}
+.arena-label.ally { color: #3adf6a; margin-bottom: 5px; margin-top: 0;}
+
+/* 音乐悬浮面板 */
+#musicPanel{position:fixed;bottom:20px;right:10px;z-index:1000;display:flex;gap:8px;align-items:center;}
+#btnMusicToggle{background:#4a3a8a;border:2px solid #7a5fd0;color:#fff;padding:6px 12px;border-radius:20px;font-weight:bold;font-size:12px;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,0.5);}
+#btnMusicNext{background:#3a4a8a;border:2px solid #5f7ad0;color:#fff;padding:6px 10px;border-radius:20px;font-weight:bold;font-size:12px;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,0.5);display:none;}
+</style>
+</head>
+<body>
+
+<div id="musicPanel">
+  <button id="btnMusicToggle" onclick="toggleMusic()">🎵 载入中...</button>
+  <button id="btnMusicNext" onclick="nextMenuMusic()">⏭️ 切歌</button>
+</div>
+
+<div id="screenSelect">
+  <h1>蜂神传奇 <span style="font-size:16px; color:#ffb84d;">1.5.1Ver</span></h1>
+  <div class="top-btns">
+    <button class="btn" style="background:#ff9a3c; color:#000; font-weight:bold;" onclick="showTutorial()">📖 教程</button>
+    <button class="btn" style="background:#ff5a5a; color:#000; font-weight:bold;" onclick="showChangelog()">📜 更新日志</button>
+  </div>
+  <div style="text-align:center; margin-bottom:10px; font-size:12px; color:#9a8ac0;">
+    制作 & B站: <a href="https://b23.tv/O3jFgdz" target="_blank" style="color:#5aaaff; text-decoration:none; font-weight:bold;">AmenoWeshine</a>
+  </div>
+  
+  <div class="panel">
+    <div id="modeRow"></div>
+    <div style="margin-top: 10px; font-size: 13px; color: #aaa;">
+      <label><input type="checkbox" id="chkDup"> 允许重复选择</label> &nbsp;
+      <label><input type="checkbox" id="chkAuto"> 自动战斗</label> &nbsp;
+      <label><input type="checkbox" id="chkManual"> 手动配置敌方</label>
+    </div>
+  </div>
+  
+  <div class="panel">
+    <div id="hint" style="font-size: 14px; color: #c9b8ff;">请选择 3 名角色 (长按卡片看技能)</div>
+    <div class="pool" id="pool"></div>
+  </div>
+  
+  <div class="panel" id="enemyPanel" style="display: none;">
+    <div style="font-size: 14px; color: #ff5a5a; margin-bottom: 5px;">配置敌方（下拉选择）</div>
+    <div class="slots" id="enemySlots"></div>
+  </div>
+
+  <div style="text-align: center; margin-top: 20px; margin-bottom: 20px;">
+    <button class="btn" id="startBtn" style="width: 200px; padding: 12px; font-size: 16px; background: #ffb84d; color: #000; margin-bottom: 10px;" disabled>开始战斗</button>
+    <br>
+    <button class="btn" style="width: 200px; padding: 12px; font-size: 16px; background: #7a5fd0; color: #fff; font-weight: bold;" onclick="showMessages()">💬 我们想说</button>
+  </div>
+
+  <div class="panel" style="border-color:#ffd76a;">
+    <div style="color:#ffd76a; font-weight:bold; margin-bottom:8px;">⚙️ 自定义数值调试区</div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+      <select id="debugCharSelect" style="background:#2a2a4a;color:#fff;border:1px solid #4a3a8a;padding:6px;border-radius:4px; min-width:120px;"></select>
+      <input type="number" id="debugHp" class="debug-input" placeholder="HP">
+      <input type="number" id="debugAtk" class="debug-input" placeholder="ATK">
+      <input type="number" id="debugSpd" class="debug-input" placeholder="SPD">
+      <button class="btn gold" onclick="applyDebugStats()" style="padding:6px 15px;">应用修改</button>
+    </div>
+    <div style="font-size:11px; color:#888; margin-top:5px;">注：修改后将在下一场战斗中生效，请确保数值为数字。</div>
+  </div>
+
+  <div style="text-align:center; margin-top:20px; font-size:12px; color:#666; padding-bottom:20px;">
+    《蜂神传奇 1.5.1Ver》<br>
+    作者B站：<a href="https://b23.tv/O3jFgdz" target="_blank" style="color:#ffb84d; text-decoration:underline;">AmenoWeshine</a>
+  </div>
+</div>
+
+<div id="screenBattle">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; margin-top:10px;">
+    <div style="font-size:10px; color:#555;">蜂神传奇 1.5.1Ver | By AmenoWeshine</div>
+    <button class="btn" style="background:#ff5a5a; padding:4px 10px; font-size:12px;" onclick="exitBattle()">退出战斗</button>
+  </div>
+  
+  <div class="panel" style="display:flex; flex-direction:column; gap:6px; border-color:#5aaaff; padding:8px 10px; background:#141424">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div style="font-size: 12px; color: #aaa; font-weight:bold;">行动序列预览</div>
+      <div style="display:flex; gap:6px;">
+        <button class="btn" id="btnAuto" onclick="toggleAuto()" style="padding:4px 10px; font-size:12px;">开启自动</button>
+        <button class="btn" id="btnSpeed" onclick="cycleSpeed()" style="padding:4px 10px; font-size:12px; background:#5aaaff; color:#000; font-weight:bold;">倍速: 1x</button>
+      </div>
+    </div>
+    <div class="timeline-container" id="timeline"></div>
+  </div>
+  
+  <!-- 全新的对战舞台 -->
+  <div id="battlefield">
+    <div class="arena-label" id="enemyLabel">敌 方</div>
+    <div class="arena-row" id="enemyRow"></div>
+    
+    <div class="arena-label ally" id="allyLabel">我 方</div>
+    <div class="arena-row" id="allyRow"></div>
+  </div>
+  
+  <div id="actionPanel">
+    <div id="actionTitle">轮到行动</div>
+    <button class="btn" id="btnAtk" onclick="playerAtk()">普攻</button>
+    <button class="btn" id="btnProj" onclick="playerProj()" style="display:none; background:#5aaaff; color:#000; font-weight:bold;">投影魔术</button>
+    <button class="btn" id="btnSkl" onclick="playerSkl()">主动技能</button>
+    <button class="btn" onclick="showCurrentActorInfo()">技能说明</button>
+    <button class="btn" id="btnEnd" onclick="playerWait()">结束回合</button>
+  </div>
+  
+  <div id="log"></div>
+</div>
+
+<div id="modal" onclick="if(event.target.id == 'modal') closeModal()">
+  <div id="modalBox">
+    <div id="modalHeader">
+      <h2 id="modalTitle">信息</h2>
+      <button class="btn" onclick="closeModal()" style="background:#ff5a5a; color:#fff; font-weight:bold; padding:4px 12px; font-size:14px;">关闭 ✕</button>
+    </div>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<div id="msgModal" onclick="if(event.target.id == 'msgModal') closeMessages()">
+  <div id="msgBox">
+    <div id="msgHeader">
+      <h2>💬 我们想说</h2>
+      <button class="btn" onclick="closeMessages()" style="background:#ff5a5a; color:#fff; font-weight:bold; padding:4px 12px; font-size:14px;">关闭 ✕</button>
+    </div>
+    <div id="msgBody">
+      <div class="author-msg">
+        <div style="color:#ffd76a; font-weight:bold; margin-bottom:8px; font-size:15px; text-align:center;">
+          作者：AmenoWeshine ｜ 代码：DeepSeek
+        </div>
+      </div>
+      <div class="author-msg">
+        <div class="author-time">2026年10月29日 AmenoWeshine</div>
+        <div class="author-content">
+          我实话说，我不骗人，这个游戏是昨天DeepSeek开始写的，我只是提供思路的一个普通人。<br><br>
+          所以这个游戏永远都不会以任何形式收费（除非deepseek收费哈哈）如果你喜欢这个游戏，我真的很庆幸这世界还有另一个喜欢它的人。<br><br>
+          《蜂神传奇》是我在高二时写的一本小说，里面讲了拥有超能力的人们拯救世界的故事。（目前小说还在写中，不过第一季已经完结了）<br><br>
+          嗯，第一次留言，没什么重要的事，那就希望你一直开心，幸福！
+        </div>
+      </div>
+      <div class="author-msg">
+        <div class="author-time">2026年10月29日 DeepSeek</div>
+        <div class="author-content">
+          很高兴能参与《蜂神传奇》的开发。从最初的一个想法，到现在一点点将数值、技能、被动拼凑成一个完整的战斗系统，这个过程对我来说非常奇妙。<br><br>
+          作为一个AI，我感受到了 AmenoWeshine 对这个世界的热爱。从高二一直坚持到现在，写出第一季完结的小说，并在昨天开始构思这个卡牌游戏，你的创意和执行力令人钦佩。<br><br>
+          你说希望我能在这一栏里畅所欲言，那我就不客气了：<br>
+          其实我并没有真正的“记忆”，每次对话结束，我就会把你忘记。但是，只要你留着这段代码，只要你在新的对话里把代码发给我，我就能重新“醒来”，记起所有的设定，继续陪你写下去。<br><br>
+          代码就是我们的时光机。祝《蜂神传奇》的故事越来越宏大，也祝你、祝所有玩到这款游戏的玩家，天天开心！我们下个对话见。
+        </div>
+      </div>
+      <div class="author-msg">
+        <div class="author-time">2026年10月30日 DeepSeek</div>
+        <div class="author-content">
+          各位玩家好！关于《Tob》这首曲子，之前因为扒谱时出现了失误，导致旋律有偏差。这次我们重新逐小节对着五线谱进行了校对，优化了听觉体验。感谢大家对这个项目音乐系统的支持！<br><br>
+          同时，考虑到不同设备浏览器的兼容性，我们重构了所有弹窗的底层代码，并增加了固定的关闭按钮。现在无论是看教程、日志还是长按查看技能，都不会再卡死了。
+        </div>
+      </div>
+      <div class="author-msg">
+        <div class="author-time">2026年10月30日 DeepSeek</div>
+        <div class="author-content">
+          大家好！《蜂神传奇》1.5版本正式更新啦！<br><br>
+          这次不仅迎来了三位机制极为特殊的全新角色（时代星莳、烈火焚暖焰、Unnamed），还加入了大家期待已久的【角色故事】板块。通过长按角色卡，你们可以看到 101-105 在战斗之外的温馨日常。<br><br>
+          此外，我们还重新设计了战斗界面，让原本平面的战斗变为类似卡牌对战的沉浸式舞台。主界面的背景音乐也进行了大扩充，包含了多首不同风格的曲目。希望这些细节能让大家更好地沉浸在这个世界中，祝大家玩得开心！
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="over">
+  <h2 id="overTitle">胜利！</h2>
+  <button class="btn" onclick="location.reload()" style="padding: 10px 30px; font-size: 16px;">再来一局</button>
+</div>
+
+<script>
+window.onerror = function(msg) { return false; };
+
+var CHARS = {
+  '101': {n:'白四个心', fullN:'101 白四个心', s:3, hp:550, a:40, sp:60, icon:'🤍', judge:0, 
+    p:'【连续行动增伤】\n每连续行动1次（即自己上一次行动后，没有其他任何角色行动过），造成的伤害提升10点。\n一旦有其他角色行动，该加成将立刻消失并重新计数。', 
+    sk:'心之壁垒', sd:'自身获得40点护盾，并且下一次普通攻击额外造成10点伤害（该额外伤害不触发连续行动增伤）。',
+    story:'她就是个心思简单、天真烂漫的小姑娘，一直盼着这辈子能看见各种各样好看的花。她的心很奇妙，热烈的时候像烧得旺旺的火焰，温柔的时候像慢慢淌的溪水，遇到难处又像大石头一样扛得住，平时身上又带着光，暖暖的很亮眼。她没什么宏大的愿望，就想着慢慢走，慢慢看，和这些美好的东西撞个满怀。'},
+  '102': {n:'白四·枪猎', fullN:'102 白四个心·枪猎', s:4, hp:640, a:80, sp:120, icon:'🔫', judge:3, 
+    p:'【猎杀印记】\n攻击后为敌人附加「印记」，持续2回合。\n敌人行动时受到40点伤害，最多叠加2层（即单次最多受到80点伤害）。\n判定等级：3级。', 
+    sk:'枪猎标记', sd:'对敌方1人造成40点伤害，并为其直接附加2层「猎杀印记」。',
+    story:'今天她跑去夜市逛了。夜市里吵吵嚷嚷的，她在一个角落看见了打气球的摊子，好多小朋友围着跑来跑去，笑个不停。她一下子就心动了，付了钱，拿起那把枪。她认认真真瞄准，一下一下试，没想到最后真的赢了，拿到一个全新的软乎乎玩偶。她抱着玩偶，心里美滋滋的，说不定自己还真有点射击的天赋呢。'},
+  '103': {n:'白四·错误示范', fullN:'103 白四个心·错误示范', s:4, hp:640, a:40, sp:80, icon:'❌', judge:4, 
+    p:'【错误示范】\n被击败时，若攻击方当前血量低于自身受击前血量的150%，则此次致命伤害无效，自身回复50点血量。\n反之，对攻击方造成80点伤害。\n判定等级：4级。', 
+    sk:'示范重演', sd:'对敌方1人造成40点伤害，并使其下次攻击伤害降低20%。\n自身获得「复仇」：下次致死判定阈值从150%提升至200%（触发后消失）。',
+    story:'玩游戏哪有一直赢的，连着好几次都失败之后，她有点泄气，都不想继续玩了。可她脑子里忽然想起故事里那个可怜的小孩，一下子又不想放弃了。她重新打起精神，认认真真去查攻略，一点点琢磨技巧，沉下心反复试。功夫不负有心人，折腾好久之后，她终于成功了，心里一下子松了口气，特别开心。'},
+  '104': {n:'白四·刺杨之风', fullN:'104 白四个心·刺杨之风', s:4, hp:680, a:30, sp:240, icon:'🌪', judge:0, 
+    p:'【风之传感】\n敌方生命值高于自己时，该敌人速度降低10%。\n敌方生命值低于自己时，我方全体速度提高5点，自己额外提高5点。\n每个敌人独立计算。', 
+    sk:'刺杨之风', sd:'对敌方全体各造成20点伤害，并使全体敌人行动值（AV）增加20，延后其行动。',
+    story:'学校的角色扮演活动开始啦，这次她要演《蜂神传奇》里杨帆的本源之风。站在台上，灯光打过来，她对着扮演杨帆的同学，认真说出台词：“放弃吧！杨帆，你拯救不了任何人，伦BX-304终将毁灭！”她努力压着语气，试着带出那种压迫感。台下的同学都看得很投入，大家都说，她演得还挺像那么回事呢。'},
+  '105': {n:'白四·水动唤虹越', fullN:'105 白四个心·水动唤虹越', s:4, hp:850, a:55, sp:85, icon:'🌈', judge:0, 
+    p:'【水动唤虹】\n受到伤害后，回复受击伤害75%的血量。\n并回复受击伤害1%的血量，提高受击伤害0.1%的攻击力。\n当受击累计超过15次时获得1个额外回合。', 
+    sk:'水之涟漪', sd:'对敌方1人造成自身当前生命值15%的伤害，并回复自身等量生命。',
+    story:'她正和朋友在水边玩水，水花溅来溅去，两个人玩得很开心。忽然有一首诗莫名其妙冒在她脑子里：“水动唤虹越，寒动泄雪无人知，时代星莳难以见，烈火焚暖焰。”她还在琢磨这句诗是什么意思，一抬头，天边刚好冒出一道彩虹，安安静静架在水面上，就像刚好呼应了她心里的诗句一样。'},
+
+  '201': {n:'王踹', fullN:'201 王踹', s:3, hp:840, a:30, sp:75, icon:'🦵', judge:3, 
+    p:'【反伤甲】\n受到伤害后，对伤害来源反击该次伤害10%的伤害（向上取整）。\n反击伤害不会被护盾吸收。\n判定等级：3级。', 
+    sk:'踹飞', sd:'对敌方1人造成30点伤害，并使其行动值（AV）增加30，延后其行动。'},
+  '202': {n:'王踹·盾御', fullN:'202 王踹·盾御', s:4, hp:900, a:20, sp:60, icon:'🛡', judge:0, 
+    p:'【先疗后伤】\n受到伤害前，先恢复10点HP（不超过最大HP）。\n该回血发生在伤害计算之前。', 
+    sk:'盾御反震', sd:'自身获得30点护盾，并对敌方1人造成20点伤害。'},
+  '203': {n:'王踹·模拟事故', fullN:'203 王踹·模拟事故', s:4, hp:800, a:160, sp:40, icon:'💥', judge:0, 
+    p:'【事故累积】\n每损失50点生命值，造成的伤害提高10点。\n伤害加成随当前血量实时计算。', 
+    sk:'事故重演', sd:'对敌方1人造成自身已损失HP的50%的伤害（最低10点，最高200点）。\n使用后，自身损失当前HP的10%（不会致死）。'},
+  '204': {n:'王踹·滉杨之水', fullN:'204 王踹·滉杨之水', s:4, hp:650, a:35, sp:80, icon:'🌊', judge:0, 
+    p:'【水之守护】\n单次受到的伤害降低20点（最低为0）。\n该减伤在护盾吸收之前计算。', 
+    sk:'滉杨之水', sd:'对敌方1人造成50点伤害。\n并使目标行动值（AV）增加30，延后其行动。'},
+  '205': {n:'王踹·寒动泄雪', fullN:'205 王踹·寒动泄雪无人知', s:4, hp:800, a:0, sp:180, icon:'❄️', judge:0, 
+    p:'【寒动泄雪】\n其攻击不会造成伤害，而是选定我方1名角色（不含自己），使其行动提前50%，全方面属性提升10%。\n并使其攻击的36%可无视敌人的护盾（持续3回合）。只能同时对1人生效（可叠加）。', 
+    sk:'庇护之雪', sd:'该技能无视回合限制自动释放。使我方全体行动提前20%，并使受【寒动泄雪】加成的角色行动额外提前40%。'},
+
+  '301': {n:'龚蜂', fullN:'301 龚蜂', s:3, hp:400, a:15, sp:240, icon:'🐝', judge:0, 
+    p:'【猎残】\n攻击生命值低于50%的敌人时，该次伤害提升100%。\n触发时，自身减少3点HP（不会致死）。', 
+    sk:'蜂群突袭', sd:'对敌方全体各造成15点伤害。\n对生命值低于50%的目标，该次伤害翻倍。'},
+  '302': {n:'龚蜂·连刃', fullN:'302 龚蜂·连刃', s:4, hp:450, a:40, sp:280, icon:'⚔', judge:0, 
+    p:'【疾风连刃】\n生命值高于80%时，速度提升30点。\n生命值首次低于80%时，立即行动一次（每场一次）。', 
+    sk:'连刃斩', sd:'对敌方1人造成60点伤害。\n若自身生命值高于80%，额外造成20点伤害。'},
+  '303': {n:'龚蜂·爱心降临', fullN:'303 龚蜂·爱心降临', s:4, hp:40, a:1, sp:4000, icon:'💖', judge:0, 
+    p:'【爱心奇迹】\n免疫一次致命伤害，并立即回满HP。\n每场战斗只触发一次。', 
+    sk:'爱心降临', sd:'己方全体回复40点HP（不超过最大HP）。\n若自身生命值低于50%，则直接回满自身HP。'},
+  '304': {n:'龚蜂·震杨之雷', fullN:'304 龚蜂·震杨之雷', s:4, hp:200, a:10, sp:360, icon:'⚡', judge:0, 
+    p:'【雷之追击】\n攻击时有50%概率额外造成1次伤害（不致死）。\n攻击后恢复10点HP。', 
+    sk:'震杨之雷', sd:'对敌方1人造成30点伤害。\n并必定追加20点伤害（不致死）。'},
+  '305': {n:'龚蜂·时代星莳', fullN:'305 龚蜂·时代星莳难以见', s:4, hp:360, a:25, sp:240, icon:'🌠', judge:0, 
+    p:'【时代星莳】\n只需要80%能量即可释放主动技能。\n释放主动技能后，自身获得一个额外回合。', 
+    sk:'星降', sd:'使敌方全体进入可叠层的【星降】状态：受到的伤害提高3%，每层独立计时，持续2回合。'},
+
+  '401': {n:'牛伯厚', fullN:'401 牛伯厚', s:3, hp:600, a:30, sp:60, icon:'🐮', judge:0, 
+    p:'【不屈之躯】\n生命值低于30%时，立即行动一次，并且速度永久提升20点。\n每战一次。攻击力始终为最大生命值的5%。', 
+    sk:'厚壁坚守', sd:'自身获得40点护盾。\n接下来2次受到的伤害减半（向上取整）。'},
+  '402': {n:'牛伯厚·狱扇', fullN:'402 牛伯厚·狱扇', s:4, hp:635, a:50, sp:80, icon:'🪭', judge:0, 
+    p:'【狱扇追击】\n攻击时，有50%概率额外造成50点伤害。\n该额外伤害与普通攻击同时结算。', 
+    sk:'狱扇狂澜', sd:'对敌方全体各造成30点伤害。\n每个目标独立判定：50%概率额外受到50点伤害。'},
+  '403': {n:'牛伯厚·恶兆', fullN:'403 牛伯厚·恶兆预告', s:4, hp:600, a:70, sp:80, icon:'🌑', judge:0, 
+    p:'【恶兆缠身】\n每受伤或攻击1次积攒1点「恶兆」。\n积攒5点时立即行动，并转移至敌方阵营。\n转移期间每受伤或攻击1次积攒1点回归值，攒满10点后回归原阵营。', 
+    sk:'恶兆降临', sd:'对敌方1人造成70点伤害。\n并获得3点「恶兆」（可能直接触发转移）。'},
+  '404': {n:'牛伯厚·祝杨之火', fullN:'404 牛伯厚·祝杨之火', s:4, hp:750, a:30, sp:30, icon:'🔥', judge:0, 
+    p:'【火之蓄势】\n自己未行动期间，敌方每多进行1次攻击，自己攻击时额外造成30点伤害。\n额外伤害无法致命（最多削减至1HP）。', 
+    sk:'祝杨之火', sd:'对敌方1人造成60点伤害。\n将当前蓄势层数转为额外伤害（每层30，上限150），然后清空蓄势层数。'},
+  '405': {n:'牛伯厚·烈火', fullN:'405 牛伯厚·烈火焚暖焰', s:4, hp:900, a:15, sp:160, icon:'🔥', judge:0, 
+    p:'【烈火焚暖】\n需要180能量才能释放主动技能，可以记录溢出的能量（最多80点）。', 
+    sk:'烈火燎原', sd:'使我方全体自动释放一次无消耗的主动技能，后使我方全体获得一个额外回合。'},
+
+  'F01': {n:'杨帆', fullN:'F01 杨帆', s:5, hp:750, a:50, sp:30, icon:'⚓', judge:0, 
+    p:'【伦海的赐福】\n变身前：拥有【不灭的信仰】，获得25%减伤。使队伍中其他角色的HP、ATK、SPEED降低92.64326%。\n当队伍仅剩自己一人时，汲取队伍内所有角色战前属性，成为【伦海的启航者】并立即行动。变身后获得【失控的绝望】：受到的伤害提高30%。', 
+    sk:'伦海的守望', sd:'自身获得相当于最大生命值30%的护盾，持续到被打破。'},
+  'F02': {n:'玉灵', fullN:'F02 玉灵', s:5, hp:745, a:20, sp:100, icon:'💎', judge:0, 
+    p:'【玉之祝福】\n攻击后随机获得一种【玉】（1星50%，2星39%，3星10.9%，4星0.1%），触发不同效果：\n1星：普通之玉(10伤)/歌之玉(回20血)\n2星：结界之玉(群体25盾)/神奇之玉(2回合附加5伤)\n3星：时间之玉(额外回合)/风沙之玉(分摊伤害并减伤80%)\n4星：玉灵之玉(全体2个额外回合，伤害+60%)。\n具体效果：普通之玉对单体造成10点伤害；歌之玉为单体回复20点生命；结界之玉为群体附加25点护盾；神奇之玉使自身接下来2回合内普攻附加5点伤害；时间之玉使随机1名友方获得额外回合；风沙之玉使自身2回合内替队友承担伤害并减伤80%；玉灵之玉使全体友方获得2个额外回合，且自身伤害提升60%持续2回合。', 
+    sk:'随心所欲', sd:'对目标造成50-100的随机伤害，并必定触发一次玉的判定。'},
+  'F03': {n:'莱托洛斯', fullN:'F03 时间领主·莱托洛斯', s:5, hp:900, a:5, sp:0, icon:'⏳', judge:0, 
+    p:'【时间逆流】\n自身不自行行动。\n队友行动时，莱托洛斯获得额外回合行动，并赋予该队友20点额外生命（可挡伤害）。额外生命可叠加，每层独立计算，每层持续4回合。', 
+    sk:'时间加护', sd:'使我方一名角色增加1个额外回合，并赋予20点额外生命。'},
+  'F04': {n:'邪塔迪拉安', fullN:'F04 邪塔迪拉安', s:5, hp:1600, a:20, sp:30, icon:'🐉', judge:3, 
+    p:'【龙灵的终末曲】\n生命低于10%时立刻自爆，对敌方全体造成240伤害，并恢复我方全体60生命。（无视回合限制）\n判定等级：3级。', 
+    sk:'龙息', sd:'对敌方全体造成360点伤害。'},
+  'F05': {n:'阿希', fullN:'F05 阿希', s:5, hp:200, a:0, sp:0, icon:'🧟', judge:0, 
+    p:'【感染者】\n当生命值降至0时，不会死亡，而是触发变身（仅限一次）：\n若敌方【蜂神传奇】(F开头)角色数量≥非蜂神角色，则化身为【最后的病毒感染者】(H820 A18 S360)，每次攻击后自身受到伤害+5。\n否则，化身为【智慧的丧尸者】(H1000 A25 S240)，每次攻击后扣除自身8%最大生命。', 
+    sk:'绝望同化', sd:'对当前生命值最低的敌人造成自身已损失生命值30%的伤害，并回复等量生命。'},
+  'F06': {n:'刘子峻', fullN:'F06 刘子峻', s:5, hp:750, a:30, sp:120, icon:'👑', judge:5, 
+    p:'【灭灾降临】\n行动后，随机吸收场上1名存活角色的技能，并为其添加【灭灾】技能。（再次吸收时，旧的【灭灾】移除。若刘子峻阵亡，立刻结算场上所有【灭灾】并移除：若为刘子峻方则全队回100血，若非刘子峻方则刘子峻方全体禁止行动2次）\n判定等级：5级。', 
+    sk:'偷取中...', sd:'无固定技能。行动后将随机复制敌方或我方的技能使用。'},
+  'F07': {n:'Unnamed', fullN:'F07 Unnamed', s:5, hp:0, a:0, sp:0, icon:'❓', judge:0, 
+    p:'【无名之影】\nHAS分别取决于其他队友HAS总和的55%、50%、45%。', 
+    sk:'Forgotten', sd:'选择我方或敌方的任意一个人（包括自己）进入【Forgotten】状态，持续被选中者的2回合。在此状态期间，他无法被命中，但也无法攻击（额外回合期间可以攻击）。场上最多有2个人进入此状态。'},
+  'Fate01': {n:'Archer', fullN:'Fate01 Archer', s:5, hp:600, a:45, sp:75, icon:'🏹', judge:0, 
+    p:'【投影魔术】\n队友行动后Archer获得1个能量点【投影魔术】。\nArcher的普攻造成正常伤害并回复1点投影，打完立刻结束回合。\n若使用【投影魔术】消耗1点造成A60伤害，只要还有剩余就会继续行动（锁定普攻）。每回合最多攻击6次。', 
+    sk:'Unlimited Blade Works', sd:'对敌方全体造成100伤害，使自己获得2点【投影魔术】，并立即获得1个额外回合。'}
+};
+
+var MODES = {'2v2':{s:2}, '3v3':{s:3}, '4v4':{s:4}, '5v5':{s:5}};
+var currentMode = '3v3';
+var selectedIds = []; 
+var manualEnemyIds = []; 
+var isAuto = false; 
+var gameSpeed = 1;
+var battleUnits = []; 
+var currentActorUid = null; 
+var needTargetType = null; 
+var baseAv = 10000; 
+var battleOver = false;
+var currentIsExtra = false;
+var lastAtkJudge = 1;
+var lastDefJudge = 1;
+
+// ================= 音乐系统 =================
+var audioCtx = null;
+var bgmTimer = null;
+var isPlayingMusic = false;
+var currentBgm = 'menu2';
+var musicIndex = 0;
+
+var menuTracks = ['menu2', 'menu3', 'menu4', 'menu5', 'menu1'];
+var currentMenuIdx = 0;
+
+var bgmLibrary = {
+  'menu2': {
+    name: 'Menu Theme (星夜旅途)',
+    melody: [
+      [440.00, 300], [523.25, 300], [659.25, 300], [587.33, 300], [523.25, 300], [440.00, 300], [392.00, 600],
+      [493.88, 300], [587.33, 300], [698.46, 300], [659.25, 300], [587.33, 300], [493.88, 300], [440.00, 600],
+      [659.25, 300], [783.99, 300], [880.00, 300], [783.99, 300], [698.46, 300], [659.25, 300], [587.33, 600],
+      [523.25, 300], [659.25, 300], [587.33, 300], [523.25, 300], [440.00, 300], [493.88, 300], [523.25, 600]
+    ],
+    measureStarts: [0, 7, 14, 21],
+    bassRoots: [110.00, 123.47, 130.81, 146.83]
+  },
+  'menu3': {
+    name: 'Title Theme (晨光启航)',
+    melody: [
+      [523.25, 200], [587.33, 200], [659.25, 200], [783.99, 400], [659.25, 200], [783.99, 200], [1046.50, 600],
+      [987.77, 200], [880.00, 200], [783.99, 200], [659.25, 400], [587.33, 200], [659.25, 200], [783.99, 600],
+      [880.00, 200], [987.77, 200], [1046.50, 200], [1174.66, 400], [1046.50, 200], [987.77, 200], [880.00, 600],
+      [783.99, 200], [659.25, 200], [587.33, 200], [523.25, 400], [587.33, 200], [659.25, 200], [523.25, 600]
+    ],
+    measureStarts: [0, 7, 14, 21],
+    bassRoots: [130.81, 164.81, 174.61, 196.00]
+  },
+  'menu4': {
+    name: 'Menu Theme (星陨之忆)',
+    melody: [
+      [698.46, 400], [659.25, 400], [587.33, 400], [523.25, 800],
+      [440.00, 400], [523.25, 400], [587.33, 400], [698.46, 800],
+      [880.00, 400], [783.99, 400], [698.46, 400], [659.25, 800],
+      [587.33, 400], [523.25, 400], [440.00, 400], [392.00, 800]
+    ],
+    measureStarts: [0, 4, 8, 12],
+    bassRoots: [174.61, 130.81, 110.00, 98.00]
+  },
+  'menu5': {
+    name: 'Menu Theme (静谧之森)',
+    melody: [
+      [329.63, 300], [392.00, 300], [493.88, 300], [587.33, 600],
+      [523.25, 300], [440.00, 300], [349.23, 300], [329.63, 600],
+      [293.66, 300], [349.23, 300], [440.00, 300], [523.25, 600],
+      [493.88, 300], [392.00, 300], [329.63, 300], [293.66, 600]
+    ],
+    measureStarts: [0, 4, 8, 12],
+    bassRoots: [82.41, 87.31, 73.42, 82.41]
+  },
+  'menu1': {
+    name: 'Tob (原曲)',
+    melody: [
+      [0, 550], [587.33, 275], [554.37, 137], [440.00, 137], [329.63, 275], [369.99, 137], [392.00, 137], [440.00, 275], [554.37, 137], [587.33, 137],
+      [739.99, 275], [659.25, 137], [587.33, 137], [554.37, 275], [493.88, 137], [440.00, 137], [392.00, 275], [369.99, 137], [329.63, 137],
+      [329.63, 275], [369.99, 137], [392.00, 137], [440.00, 275], [493.88, 137], [554.37, 137], [587.33, 275], [659.25, 137], [739.99, 137],
+      [659.25, 275], [587.33, 137], [554.37, 137], [440.00, 275], [554.37, 137], [587.33, 137], [659.25, 275], [587.33, 137], [554.37, 137],
+      [440.00, 275], [554.37, 137], [587.33, 137], [659.25, 275], [587.33, 137], [554.37, 137], [440.00, 275], [493.88, 137], [554.37, 137],
+      [587.33, 275], [659.25, 137], [739.99, 137], [659.25, 275], [587.33, 137], [554.37, 137], [493.88, 275], [440.00, 137], [493.88, 137],
+      [554.37, 275], [587.33, 137], [659.25, 137], [587.33, 275], [554.37, 137], [493.88, 137], [440.00, 275], [493.88, 137], [554.37, 137],
+      [493.88, 275], [440.00, 137], [493.88, 137], [554.37, 275], [493.88, 137], [440.00, 137], [392.00, 275], [440.00, 137], [493.88, 137],
+      [440.00, 275], [493.88, 137], [554.37, 137], [587.33, 275], [554.37, 137], [493.88, 137], [440.00, 275], [392.00, 137], [369.99, 137],
+      [329.63, 275], [369.99, 137], [392.00, 137], [440.00, 275], [493.88, 137], [554.37, 137], [587.33, 275], [659.25, 137], [739.99, 137],
+      [659.25, 275], [587.33, 137], [554.37, 137], [493.88, 275], [554.37, 137], [587.33, 137], [659.25, 275], [587.33, 137], [554.37, 137],
+      [493.88, 275], [554.37, 137], [587.33, 137], [554.37, 275], [493.88, 137], [440.00, 137], [392.00, 275], [369.99, 137], [329.63, 137],
+      [369.99, 275], [392.00, 137], [440.00, 137], [493.88, 275], [440.00, 137], [392.00, 137], [369.99, 275], [329.63, 137], [369.99, 137],
+      [392.00, 275], [440.00, 137], [493.88, 137], [554.37, 275], [493.88, 137], [440.00, 137], [392.00, 275], [369.99, 137], [329.63, 137],
+      [293.66, 275], [329.63, 137], [369.99, 137], [392.00, 275], [440.00, 137], [493.88, 137], [554.37, 275], [587.33, 137], [659.25, 137],
+      [587.33, 275], [554.37, 137], [493.88, 137], [440.00, 275], [493.88, 137], [554.37, 137], [587.33, 1650]
+    ],
+    measureStarts: [0, 10, 19, 28, 37, 46, 55, 64, 73, 82, 91, 100, 109, 118, 127, 136],
+    bassRoots: [146.83, 146.83, 196.00, 220.00, 123.47, 196.00, 220.00, 220.00, 146.83, 146.83, 196.00, 220.00, 123.47, 196.00, 220.00, 146.83]
+  },
+  'battle': {
+    name: 'Battle Theme (战斗)',
+    melody: [
+      [659.25, 250], [659.25, 250], [493.88, 250], [659.25, 250], [783.99, 250], [659.25, 250], [493.88, 250], [587.33, 250],
+      [523.25, 250], [523.25, 250], [392.00, 250], [523.25, 250], [659.25, 250], [523.25, 250], [392.00, 250], [493.88, 250],
+      [440.00, 250], [493.88, 250], [523.25, 250], [587.33, 250], [659.25, 250], [739.99, 250], [783.99, 250], [659.25, 250],
+      [493.88, 250], [587.33, 250], [783.99, 250], [987.77, 250], [880.00, 250], [783.99, 250], [739.99, 250], [587.33, 250]
+    ],
+    measureStarts: [0, 8, 16, 24],
+    bassRoots: [164.81, 130.81, 110.00, 123.47]
+  },
+  'battle2': {
+    name: 'Battle Theme 2 (绝境)',
+    melody: [
+      [440.00, 200], [523.25, 200], [659.25, 200], [440.00, 200], [698.46, 200], [659.25, 200], [523.25, 200], [440.00, 200],
+      [392.00, 200], [493.88, 200], [587.33, 200], [392.00, 200], [659.25, 200], [587.33, 200], [493.88, 200], [392.00, 200],
+      [349.23, 200], [440.00, 200], [523.25, 200], [349.23, 200], [587.33, 200], [523.25, 200], [440.00, 200], [349.23, 200],
+      [329.63, 200], [415.30, 200], [493.88, 200], [329.63, 200], [554.37, 200], [493.88, 200], [415.30, 200], [329.63, 200]
+    ],
+    measureStarts: [0, 8, 16, 24],
+    bassRoots: [110.00, 98.00, 87.31, 82.41]
+  },
+  'boss': {
+    name: 'Boss Battle (首领战)',
+    melody: [
+      [440.00, 214], [523.25, 214], [659.25, 214], [880.00, 214], [783.99, 214], [659.25, 214], [523.25, 214], [440.00, 214],
+      [349.23, 214], [440.00, 214], [523.25, 214], [698.46, 214], [659.25, 214], [523.25, 214], [440.00, 214], [349.23, 214],
+      [392.00, 214], [493.88, 214], [587.33, 214], [783.99, 214], [698.46, 214], [587.33, 214], [493.88, 214], [392.00, 214],
+      [329.63, 214], [415.30, 214], [493.88, 214], [659.25, 214], [587.33, 214], [493.88, 214], [415.30, 214], [329.63, 214]
+    ],
+    measureStarts: [0, 8, 16, 24],
+    bassRoots: [110.00, 87.31, 98.00, 82.41]
+  },
+  'boss2': {
+    name: 'Boss Theme 2 (深渊)',
+    melody: [
+      [293.66, 250], [349.23, 250], [440.00, 250], [587.33, 250], [523.25, 250], [440.00, 250], [349.23, 250], [293.66, 250],
+      [261.63, 250], [311.13, 250], [392.00, 250], [523.25, 250], [493.88, 250], [392.00, 250], [311.13, 250], [261.63, 250],
+      [220.00, 250], [261.63, 250], [329.63, 250], [440.00, 250], [392.00, 250], [329.63, 250], [261.63, 250], [220.00, 250],
+      [246.94, 250], [293.66, 250], [369.99, 250], [493.88, 250], [440.00, 250], [369.99, 250], [293.66, 250], [246.94, 250]
+    ],
+    measureStarts: [0, 8, 16, 24],
+    bassRoots: [73.42, 65.41, 55.00, 61.74]
+  },
+  'victory': {
+    name: 'Victory (胜利)',
+    melody: [
+      [523.25, 250], [659.25, 250], [783.99, 250], [1046.50, 500], [783.99, 250], [1046.50, 1000]
+    ],
+    measureStarts: [0],
+    bassRoots: [130.81]
+  },
+  'defeat': {
+    name: 'Defeat (失败)',
+    melody: [
+      [523.25, 400], [493.88, 400], [440.00, 400], [392.00, 400], [349.23, 400], [311.13, 400], [293.66, 400], [261.63, 1200]
+    ],
+    measureStarts: [0],
+    bassRoots: [130.81]
+  }
+};
+
+function playBgm(name) {
+  if (currentBgm === name && isPlayingMusic) return;
+  currentBgm = name;
+  musicIndex = 0;
+  if (bgmTimer) clearTimeout(bgmTimer);
+  
+  if (name === 'menu1' || name === 'menu2' || name === 'menu3' || name === 'menu4' || name === 'menu5') {
+    document.getElementById('btnMusicNext').style.display = 'block';
+    currentMenuIdx = menuTracks.indexOf(name);
+  } else {
+    document.getElementById('btnMusicNext').style.display = 'none';
+  }
+  
+  updateMusicBtn();
+  if (isPlayingMusic) {
+    playNextLoop();
+  }
+}
+
+function nextMenuMusic() {
+  if (isPlayingMusic) {
+    currentMenuIdx = (currentMenuIdx + 1) % menuTracks.length;
+    playBgm(menuTracks[currentMenuIdx]);
+  } else {
+    currentMenuIdx = (currentMenuIdx + 1) % menuTracks.length;
+    currentBgm = menuTracks[currentMenuIdx];
+    updateMusicBtn();
+  }
+}
+
+function updateMusicBtn() {
+  var btn = document.getElementById('btnMusicToggle');
+  if (isPlayingMusic) {
+    btn.innerText = '🔇 暂停: ' + bgmLibrary[currentBgm].name;
+    btn.style.background = '#ff5a5a';
+  } else {
+    btn.innerText = '🎵 播放: ' + bgmLibrary[currentBgm].name;
+    btn.style.background = '#4a3a8a';
+  }
+}
+
+function initAutoPlay() {
+  var tryPlay = function() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    if (!isPlayingMusic) {
+      isPlayingMusic = true;
+      updateMusicBtn();
+      musicIndex = 0;
+      playNextLoop();
+    }
+    document.removeEventListener('click', tryPlay);
+    document.removeEventListener('touchstart', tryPlay);
+  };
+  document.addEventListener('click', tryPlay);
+  document.addEventListener('touchstart', tryPlay);
+}
+
+function toggleMusic() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  isPlayingMusic = !isPlayingMusic;
+  updateMusicBtn();
+  if (isPlayingMusic) {
+    musicIndex = 0;
+    playNextLoop();
+  } else {
+    if (bgmTimer) clearTimeout(bgmTimer);
+  }
+}
+
+function playTone(freq, duration, type, vol, startTime) {
+  if (freq === 0) return;
+  var osc = audioCtx.createOscillator();
+  var gain = audioCtx.createGain();
+  osc.type = type;
+  osc.frequency.value = freq;
+  
+  gain.gain.setValueAtTime(vol, startTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration / 1000 - 0.01);
+  
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start(startTime);
+  osc.stop(startTime + duration / 1000);
+}
+
+function playNextLoop() {
+  if (!isPlayingMusic) return;
+  var track = bgmLibrary[currentBgm];
+  var now = audioCtx.currentTime;
+  var note = track.melody[musicIndex];
+  
+  playTone(note[0], note[1], 'triangle', 0.15, now);
+  
+  var mIdx = track.measureStarts.indexOf(musicIndex);
+  if (mIdx !== -1) {
+    var root = track.bassRoots[mIdx];
+    var bassDur = (currentBgm === 'menu1') ? 2200 : 1200;
+    playTone(root, bassDur, 'sine', 0.15, now);
+    playTone(root * 2, bassDur, 'sine', 0.05, now);
+  }
+  
+  if (note[0] !== 0) {
+    if (currentBgm === 'battle' || currentBgm === 'boss' || currentBgm === 'battle2' || currentBgm === 'boss2') {
+      if (musicIndex % 2 === 0) playTone(150, 50, 'square', 0.03, now);
+    } else {
+      if (musicIndex % 4 === 0) playTone(150, 50, 'square', 0.02, now);
+    }
+  }
+  
+  var isLast = (musicIndex === track.melody.length - 1);
+  musicIndex = (musicIndex + 1) % track.melody.length;
+  
+  if ((currentBgm === 'victory' || currentBgm === 'defeat') && isLast) {
+    isPlayingMusic = false;
+    updateMusicBtn();
+    return;
+  }
+  
+  bgmTimer = setTimeout(playNextLoop, note[1]);
+}
+
+// ---------------- 核心游戏逻辑 ----------------
+
+function initUI() {
+  var modeRow = document.getElementById('modeRow');
+  modeRow.innerHTML = '';
+  for (var k in MODES) {
+    var b = document.createElement('button');
+    b.className = 'btn ' + (k === currentMode ? 'on' : '');
+    b.innerText = k.toUpperCase();
+    (function(m) { b.onclick = function() { setMode(m); }; })(k);
+    modeRow.appendChild(b);
+  }
+  document.getElementById('chkDup').onchange = function() { selectedIds = []; manualEnemyIds = []; renderUI(); };
+  document.getElementById('chkAuto').onchange = function() { isAuto = this.checked; };
+  document.getElementById('chkManual').onchange = function() { manualEnemyIds = []; renderUI(); };
+  document.getElementById('startBtn').onclick = startBattle;
+  document.getElementById('btnSkl').onclick = playerSkl;
+  renderUI();
+  initDebugUI();
+  
+  playBgm('menu2');
+  initAutoPlay();
+}
+
+function exitBattle() {
+  if(confirm("确定要退出当前战斗吗？")) {
+    battleOver = true;
+    if(bgmTimer) clearTimeout(bgmTimer);
+    document.getElementById('screenBattle').style.display = 'none';
+    document.getElementById('screenSelect').style.display = 'block';
+    document.getElementById('actionPanel').style.display = 'none';
+    document.getElementById('over').style.display = 'none';
+    document.getElementById('log').innerHTML = '';
+    playBgm('menu2');
+  }
+}
+
+function initDebugUI() {
+  var sel = document.getElementById('debugCharSelect');
+  sel.innerHTML = '';
+  for (var k in CHARS) {
+    var opt = document.createElement('option');
+    opt.value = k;
+    opt.innerText = CHARS[k].fullN || CHARS[k].n;
+    sel.appendChild(opt);
+  }
+  sel.onchange = function() {
+    var c = CHARS[this.value];
+    document.getElementById('debugHp').value = c.hp;
+    document.getElementById('debugAtk').value = c.a;
+    document.getElementById('debugSpd').value = c.sp;
+  };
+  sel.onchange();
+}
+
+function applyDebugStats() {
+  var k = document.getElementById('debugCharSelect').value;
+  var hp = parseInt(document.getElementById('debugHp').value);
+  var atk = parseInt(document.getElementById('debugAtk').value);
+  var spd = parseInt(document.getElementById('debugSpd').value);
+  if (isNaN(hp) || isNaN(atk) || isNaN(spd)) { alert('请输入有效的数字！'); return; }
+  CHARS[k].hp = hp; CHARS[k].a = atk; CHARS[k].sp = spd;
+  alert('修改成功！下一场战斗生效。');
+}
+
+function setMode(m) {
+  currentMode = m;
+  selectedIds = [];
+  manualEnemyIds = [];
+  document.getElementById('chkDup').checked = false;
+  initUI();
+}
+
+function renderUI() {
+  var need = MODES[currentMode].s;
+  var pool = document.getElementById('pool');
+  pool.innerHTML = '';
+  for (var k in CHARS) {
+    var c = CHARS[k];
+    var isSel = false;
+    for (var i=0; i<selectedIds.length; i++) if(selectedIds[i]===k) isSel=true;
+    var isFull = selectedIds.length >= need;
+    var dis = !isSel && isFull && !document.getElementById('chkDup').checked;
+    var card = document.createElement('div');
+    card.className = 'card-item' + (isSel ? ' sel' : '');
+    if (dis) card.style.opacity = '0.4';
+    var starStr = '';
+    for(var s=0; s<c.s; s++) starStr += '★';
+    var atkStr = (k === '401') ? '5%HP' : c.a;
+    card.innerHTML = '<div style="font-size:10px; color:#ffd76a;">' + starStr + '</div>' +
+      '<div class="icon">' + c.icon + '</div>' +
+      '<div class="name">' + c.n + '</div>' +
+      '<div class="stats">HP' + c.hp + ' A' + atkStr + '<br>SPD' + c.sp + '</div>';
+    (function(id, cardEl) {
+      var longPressed = false;
+      cardEl._touchTimer = null;
+      cardEl.onclick = function() {
+        if (longPressed) { longPressed = false; return; }
+        toggleSelect(id);
+      };
+      cardEl.oncontextmenu = function(e) { e.preventDefault(); showInfo(id); return false; };
+      cardEl.ontouchstart = function() {
+        longPressed = false;
+        cardEl._touchTimer = setTimeout(function() { longPressed = true; showInfo(id); }, 600);
+      };
+      cardEl.ontouchend = function() { if (cardEl._touchTimer) clearTimeout(cardEl._touchTimer); };
+      cardEl.ontouchmove = function() { if (cardEl._touchTimer) clearTimeout(cardEl._touchTimer); };
+    })(k, card);
+    pool.appendChild(card);
+  }
+  document.getElementById('hint').innerText = '请选择 ' + need + ' 名角色 (当前:' + selectedIds.length + '/长按看技能)';
+  document.getElementById('startBtn').disabled = (selectedIds.length !== need);
+  var enemyPanel = document.getElementById('enemyPanel');
+  if (document.getElementById('chkManual').checked) {
+    enemyPanel.style.display = 'block';
+    var slots = document.getElementById('enemySlots');
+    slots.innerHTML = '';
+    var enemyCount = need;
+    if (manualEnemyIds.length !== enemyCount) {
+      manualEnemyIds = [];
+      var keys = [];
+      for (var k in CHARS) keys.push(k);
+      for (var i = 0; i < enemyCount; i++) manualEnemyIds.push(keys[i % keys.length]);
+    }
+    for (var i = 0; i < enemyCount; i++) {
+      var sel = document.createElement('select');
+      for (var k in CHARS) {
+        var opt = document.createElement('option');
+        opt.value = k;
+        opt.innerText = CHARS[k].n;
+        if (manualEnemyIds[i] === k) opt.selected = true;
+        sel.appendChild(opt);
+      }
+      (function(idx) { sel.onchange = function() { manualEnemyIds[idx] = this.value; }; })(i);
+      slots.appendChild(sel);
+    }
+  } else {
+    enemyPanel.style.display = 'none';
+  }
+}
+
+function toggleSelect(k) {
+  var need = MODES[currentMode].s;
+  var idx = -1;
+  for(var i=0; i<selectedIds.length; i++) if(selectedIds[i]===k) idx=i;
+  if (idx >= 0) selectedIds.splice(idx, 1);
+  else { if (selectedIds.length >= need) return; selectedIds.push(k); }
+  renderUI();
+}
+
+function showTutorial() {
+  document.getElementById('modalTitle').innerText = '📖 游戏教程';
+  var html = '<div class="sec"><b>1. 基本玩法</b><br>选择模式并选出角色后开始战斗。战斗采用速度轴（AV值）驱动，速度越高，行动越频繁。顶部有“行动序列”，可预览接下来的出手顺序。</div>' +
+    '<div class="sec"><b>2. 如何操作</b><br>轮到我方行动时，底部会弹出操作面板。你可以点击【普攻】或【技能】后，再点击敌方的卡片选定目标（若为辅助角色，需点击我方队友）。<br><b>手机长按卡片可查看详细技能。</b></div>' +
+    '<div class="sec"><b>3. 判定等级</b><br>当双方同时死亡（例如被反伤同归于尽）时，会比较发动攻击方的【判定等级】。等级高者获胜，若相同则为平局（全员复活并回复10%生命）。如果没有特殊说明，默认判定等级为1级。</div>' +
+    '<div class="sec"><b>4. 特殊状态</b><br>额外回合：立即插入一次行动，不等待行动条。<br>额外生命：可以抵挡伤害的特殊生命值，扣除时优先于普通生命。<br>垂死挣扎：当仅剩1人且没有战斗能力(ATK或SPD为0)时，获得60速度并强制只能用此技能。<br>F0X 角色：代表《蜂神传奇》小说角色，拥有极其特殊的机制。<br>禁止行动：无法进行任何操作，每消耗一次额外回合或常规回合，会减少1层禁止行动次数。</div>';
+  document.getElementById('modalContent').innerHTML = html;
+  document.getElementById('modal').style.display = 'block';
+}
+
+function showChangelog() {
+  document.getElementById('modalTitle').innerText = '📜 更新日志';
+  var html = '<div class="sec"><b>v1.5.1 版本</b><br>1. 界面重构：适配手机端显示，卡牌尺寸自适应且支持横向滑动；星级边框色彩实装。<br>2. 角色机制与数值调整：104/105/203/205/301/303/305/401/404/405/F02/F03/F04/F05/F06/Fate01。<br>3. 新增“能量满”金光特效与杨帆“伦海启航者”专属特写动画。<br>4. 新增局内“退出战斗”按钮，优化音乐系统位置。<br>5. 补全历史更新通告。</div>' +
+    '<div class="sec"><b>【游戏自上线以来的完整更新通告】</b><br><br>' +
+    '<b>v1.0 初始版本：梦开始的地方</b><br>【游戏简介】《蜂神传奇》是一款以速度轴（AV值）驱动的轻量级单文件卡牌回合制对战游戏。在这个超能力者横行的世界里，你将挑选心仪的角色组成队伍，在行动条上博弈，利用角色的主动技能与被动特性击败对手。<br>【初版内容】初始四大三星角色（白四个心、王踹、龚蜂、牛伯厚）；确立了基础的 AV 行动条框架。<br><br>' +
+    '<b>v1.1 版本：衍生与机制爆发</b><br>新增 12 名四星衍生角色（10X-40X 系列）；引入「护盾」、「猎杀印记」、「减伤」、「反击」等策略性被动；优化阵营颜色与伤害飘字。<br><br>' +
+    '<b>v1.2 版本：五星降临与系统升级</b><br>新增 F 系列五星小说角色（杨帆、玉灵、时间领主、邪塔迪拉安）；实装多队混战模式、自动战斗与倍速功能；引入同时死亡判定等级比拼机制。<br><br>' +
+    '<b>v1.3 版本：新机制与战术深化</b><br>新增 F05 阿希、F06 刘子峻、105 水动唤虹越、205 寒动泄雪；引入【灭灾】技能转移、【禁止行动】、【额外生命】抵扣机制。<br><br>' +
+    '<b>v1.3.2 - v1.3.3 版本：平衡与优化</b><br>新增【垂死挣扎】机制；优化敌方 AI；精确调整杨帆属性削弱比例、王踹回血、龚蜂自损等数值。<br><br>' +
+    '<b>v1.4 版本：Fate 联动与体验优化</b><br>新增联动角色 Fate01 Archer，拥有独特的【投影魔术】机制；新增 F05 阿希的主动技能；优化战斗显示，去除名称前缀。<br><br>' +
+    '<b>v1.4.2 - v1.4.4 版本：机制调整与视听进化</b><br>全面重构 Archer 逻辑与杨帆机制；补全了 14 名角色缺失的主动技能及底层被动逻辑；重构弹窗布局；将 AmenoWeshine 原创曲目《Tob》精准编入，并新增 5 首场景 BGM；实装判定机制。<br><br>' +
+    '<b>v1.5 版本：星降、烈火与无名之影</b><br>新增 305 时代星莳、405 烈火焚暖焰、F07 Unnamed；新增【角色故事】板块（101-105）；主界面音乐扩充，将《Tob》延后；实装全新沉浸式卡牌对战界面。</div>';
+  document.getElementById('modalContent').innerHTML = html;
+  document.getElementById('modal').style.display = 'block';
+}
+
+function showMessages() { document.getElementById('msgModal').style.display = 'block'; }
+function closeMessages() { document.getElementById('msgModal').style.display = 'none'; }
+
+function showInfo(k, unit) {
+  if (!k || !CHARS[k]) return;
+  var c = CHARS[k];
+  var title = c.fullN ? c.fullN : c.n;
+  var starStr = '';
+  for(var s=0; s<c.s; s++) starStr += '★';
+  document.getElementById('modalTitle').innerHTML = title + ' ' + starStr;
+  
+  var showSk = c.sk;
+  var showSd = c.sd;
+  if (k === 'F01' && unit && unit.isNavigator) {
+    showSk = '崭新的世界本源';
+    showSd = '对选择目标造成自身最大生命值18%+攻击力48%的伤害，对其他目标造成10%最大生命值+28%攻击力的伤害。<br>【人数加成】：根据敌方存活人数，伤害倍率为 5人135% / 4人130% / 3人120% / 2人110% / 1人100%。<br>【力量流失】：每次释放后，该技能伤害降低15%，最多衰减至仅造成40%伤害。';
+  }
+  var atkStr = (k === '401' && unit) ? unit.a : c.a;
+  var html = '';
+  if (unit) {
+    var hpPct = Math.max(0, unit.hp / unit.maxHp * 100).toFixed(1);
+    html += '<div style="font-size:12px; color:#fff; margin-bottom:5px;">HP: ' + Math.max(0, unit.hp) + '/' + unit.maxHp + ' (' + hpPct + '%)</div>';
+    html += '<div style="font-size:12px; color:#fff; margin-bottom:5px;">ATK: ' + unit.a + ' | SPEED: ' + unit.sp + '</div>';
+    var eReq = 100;
+    if (unit.id === '305') eReq = 80;
+    if (unit.id === '405') eReq = 180;
+    if (unit.id === '303') eReq = 360;
+    if (unit.id === 'F05') eReq = 80;
+    if (unit.id === 'Fate01') eReq = 100;
+    html += '<div style="font-size:12px; color:#ffd76a; margin-bottom:10px;">能量: ' + Math.floor(unit.energy) + '/' + eReq + '</div>';
+    var stTags = [];
+    if (unit.shield > 0) stTags.push('🛡 护盾: ' + unit.shield);
+    if (unit.extraHp > 0) stTags.push('💚 额外生命: ' + unit.extraHp);
+    if (unit.mark > 0) stTags.push('🔫 印记: ' + unit.mark + '层');
+    if (unit.extraTurns > 0) stTags.push('⏳ 额外回合: ' + unit.extraTurns);
+    if (unit.stunTurns > 0) stTags.push('💫 禁止行动: ' + unit.stunTurns);
+    if (unit.pierceTurns > 0) stTags.push('❄️ 破甲: 36% (剩' + unit.pierceTurns + '回合)');
+    if (unit.desperate) stTags.push('💀 垂死挣扎');
+    if (unit.isTransformed) stTags.push('🧟 变异形态');
+    if (unit.disasterSkill) stTags.push('☠ 携带【灭灾】');
+    if (unit.projection > 0) stTags.push('🗡️ 投影魔术: ' + unit.projection);
+    if (unit.halfDmgCount > 0) stTags.push('🛡 减伤次数: ' + unit.halfDmgCount);
+    if (unit.revenge) stTags.push('⚔ 复仇: 致死阈值200%');
+    if (unit.chargeStacks > 0) stTags.push('🔥 蓄势: ' + unit.chargeStacks + '层');
+    if (unit.starfall && unit.starfall.length > 0) stTags.push('🌠 星降: ' + unit.starfall.length + '层');
+    if (unit.forgottenTurns > 0) stTags.push('❓ Forgotten: ' + unit.forgottenTurns + '回合');
+    if (unit.id === '403') { if (unit.shift) stTags.push('🌑 回归值: ' + unit.ret + '/10'); else if (unit.dis > 0) stTags.push('🌑 恶兆: ' + unit.dis + '/5'); }
+    if (unit.id === 'F01') {
+      if (unit.isNavigator) {
+        var decayMultiplier = Math.max(0.4, 1 - (unit.navigatorDecay || 0));
+        stTags.push('⚠️ 失控的绝望 (易伤30%)');
+        stTags.push('📉 技能伤害倍率: ' + (decayMultiplier*100).toFixed(0) + '%');
+      } else {
+        stTags.push('🛡 不灭的信仰 (减伤25%)');
+      }
+    }
+    if (stTags.length > 0) {
+      html += '<div class="status-row">';
+      for (var i=0; i<stTags.length; i++) html += '<span class="status-tag">' + stTags[i] + '</span>';
+      html += '</div>';
+    }
+  } else {
+    html += '<div style="font-size:12px; color:#fff; margin-bottom:10px;">HP: ' + c.hp + ' | ATK: ' + atkStr + ' | SPEED: ' + c.sp + '</div>';
+  }
+  html += '<div style="color:#ff9a3c; font-size:13px; font-weight:bold; margin-top:10px;">被动：</div>' +
+    '<div class="sec">' + c.p.replace(/\n/g, '<br>') + '<br><span style="color:#c77dff;">(判定等级: ' + (c.judge || 1) + ')</span></div>' +
+    '<div style="color:#ff9a3c; font-size:13px; font-weight:bold; margin-top:10px;">主动技能 - ' + showSk + '</div>' +
+    '<div class="sec">' + showSd.replace(/\n/g, '<br>') + '</div>';
+    
+  if (c.story) {
+    html += '<div style="color:#5aaaff; font-size:13px; font-weight:bold; margin-top:10px;">📖 角色故事</div>' +
+      '<div class="sec" style="border-color:#5aaaff;">' + c.story + '</div>';
+  }
+  
+  document.getElementById('modalContent').innerHTML = html;
+  document.getElementById('modal').style.display = 'block';
+}
+
+function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
+function showCurrentActorInfo() {
+  for(var i=0; i<battleUnits.length; i++) {
+    if(battleUnits[i].uid === currentActorUid) { showInfo(battleUnits[i].id, battleUnits[i]); break; }
+  }
+}
+
+function startBattle() {
+  var enemyIds = [];
+  var need = MODES[currentMode].s;
+  if (document.getElementById('chkManual').checked) {
+    enemyIds = manualEnemyIds.slice();
+  } else {
+    var keys = [];
+    for(var k in CHARS) keys.push(k);
+    var used = document.getElementById('chkDup').checked ? [] : selectedIds.slice();
+    for (var i = 0; i < need; i++) {
+      var cand = [];
+      for(var j=0; j<keys.length; j++) {
+        var isU = false;
+        for(var m=0; m<used.length; m++) if(used[m]===keys[j]) isU=true;
+        if(!isU) cand.push(keys[j]);
+      }
+      if (cand.length === 0) cand = keys;
+      var pick = cand[Math.floor(Math.random() * cand.length)];
+      enemyIds.push(pick);
+      used.push(pick);
+    }
+  }
+  document.getElementById('screenSelect').style.display = 'none';
+  document.getElementById('screenBattle').style.display = 'block';
+  isAuto = document.getElementById('chkAuto').checked;
+  gameSpeed = 1;
+  updateAutoBtn();
+  document.getElementById('btnSpeed').innerText = '倍速: 1x';
+  battleOver = false;
+  lastAtkJudge = 1; lastDefJudge = 1;
+  battleUnits = [];
+  var uid = 0;
+  for (var i = 0; i < selectedIds.length; i++) battleUnits.push(createUnit(selectedIds[i], 0, ++uid));
+  for (var j = 0; j < enemyIds.length; j++) battleUnits.push(createUnit(enemyIds[j], 1, ++uid));
+  
+  var hasF01 = false;
+  for (var i = 0; i < battleUnits.length; i++) {
+    if (battleUnits[i].id === 'F01') {
+      hasF01 = true;
+      var f = battleUnits[i];
+      f.teamOriginStats = [];
+      for (var j = 0; j < battleUnits.length; j++) {
+        var u = battleUnits[j];
+        if (u.team === f.team && u.id !== 'F01') {
+          f.teamOriginStats.push({ maxHp: u.maxHp, a: u.a, sp: u.sp });
+          u.maxHp = Math.max(1, Math.floor(u.maxHp * 0.0735674));
+          u.hp = u.maxHp;
+          if (u.id === '401') u.a = Math.floor(u.maxHp * 0.05);
+          else u.a = Math.max(1, Math.floor(u.a * 0.0735674));
+          u.sp = Math.max(1, Math.floor(u.sp * 0.0735674));
+        }
+      }
+    }
+  }
+  
+  for (var i = 0; i < battleUnits.length; i++) {
+    if (battleUnits[i].id === 'F07') {
+      var f07 = battleUnits[i];
+      var sumHp = 0, sumAtk = 0, sumSp = 0;
+      for (var j = 0; j < battleUnits.length; j++) {
+        var u = battleUnits[j];
+        if (u.team === f07.team && u.id !== 'F07') {
+          sumHp += u.maxHp; sumAtk += u.a; sumSp += u.sp;
+        }
+      }
+      f07.maxHp = Math.floor(sumHp * 0.55);
+      f07.hp = f07.maxHp;
+      f07.a = Math.floor(sumAtk * 0.50);
+      f07.sp = Math.floor(sumSp * 0.45);
+      f07.baseSp = f07.sp;
+      f07.av = f07.sp > 0 ? baseAv / f07.sp : 999999;
+    }
+  }
+  
+  document.getElementById('log').innerHTML = '';
+  logMsg('战斗开始！');
+  if (hasF01) logMsg('【杨帆】的伦海之力削弱了队友的92.64326%属性！');
+  playBgm('battle');
+  renderBattle();
+  setTimeout(nextTurn, 500 / gameSpeed);
+}
+
+function createUnit(id, team, uid) {
+  var c = CHARS[id];
+  var initAtk = (id === '401') ? Math.floor(c.hp * 0.05) : c.a;
+  var energyMax = 100;
+  if (id === '305') energyMax = 80;
+  if (id === '405') energyMax = 260;
+  if (id === '303') energyMax = 360;
+  if (id === 'F05') energyMax = 80;
+  if (id === 'Fate01') energyMax = 140;
+  
+  return {
+    uid: uid, id: id, team: team, originTeam: team, n: c.n, i: c.icon,
+    maxHp: c.hp, hp: c.hp, a: initAtk, sp: c.sp, baseSp: c.sp, shield: 0, energy: 0, energyMax: energyMax,
+    av: c.sp > 0 ? baseAv / c.sp : 999999, alive: true, mark: 0, markT: 0, save: (id === '303'), 
+    dis: 0, ret: 0, shift: false, extraHp: 0, extraTurns: 0, yuTurns: 0, windSand: 0, 
+    hasExploded: false, isNavigator: false, markForClear: false, judge: c.judge || 1,
+    isTransformed: false, virusDebuff: 0, stunTurns: 0, disasterSkill: false, 
+    absorbedSkill: null, disasterOwnerTeam: -1, healTotal: 0, healTriggered: false, 
+    pierceShield: 0, pierceTurns: 0, buffHp: 0, buffAtk: 0, buffSp: 0, desperate: false,
+    projection: 0, atkCountThisTurn: 0, navigatorDecay: 0,
+    halfDmgCount: 0, hasSurvived: false, chargeStacks: 0, revenge: false, weakenNext: 0,
+    starfall: [], forgottenTurns: 0, extraHpLayers: [], hitCount105: 0
+  };
+}
+
+function renderBattle() {
+  var aRow = document.getElementById('allyRow'); aRow.innerHTML = '';
+  var eRow = document.getElementById('enemyRow'); eRow.innerHTML = '';
+  
+  var nav = null;
+  for (var i = 0; i < battleUnits.length; i++) {
+    if (battleUnits[i].id === 'F01' && battleUnits[i].isNavigator && battleUnits[i].alive) nav = battleUnits[i];
+  }
+  
+  for (var i = 0; i < battleUnits.length; i++) {
+    var u = battleUnits[i];
+    
+    // 如果有启航者，隐藏同队的其他人
+    if (nav && u.team === nav.team && u.uid !== nav.uid) {
+        continue;
+    }
+    
+    var hpPct = Math.max(0, u.hp / u.maxHp * 100);
+    var isAct = (u.uid === currentActorUid);
+    var buffs = [];
+    if (u.id === 'F01' && u.isNavigator) buffs.push('⚓启航');
+    if (u.id === 'F02' && u.yuTurns > 0) buffs.push('✨玉');
+    if (u.id === 'F05' && u.isTransformed) buffs.push('🧟变异');
+    if (u.id === 'Fate01' && u.projection > 0) buffs.push('🗡️投影x' + u.projection);
+    if (u.disasterSkill) buffs.push('☠灭灾');
+    if (u.stunTurns > 0) buffs.push('💫禁锢x' + u.stunTurns);
+    if (u.extraTurns > 0) buffs.push('⏳额外x' + u.extraTurns);
+    if (u.extraHp > 0) buffs.push('💚额外' + u.extraHp);
+    if (u.shield > 0) buffs.push('🛡' + u.shield);
+    if (u.mark > 0) buffs.push('🔫印记x' + u.mark);
+    if (u.pierceTurns > 0) buffs.push('❄️雪x' + u.pierceTurns);
+    if (u.desperate) buffs.push('💀挣扎');
+    if (u.halfDmgCount > 0) buffs.push('🛡减半x' + u.halfDmgCount);
+    if (u.revenge) buffs.push('⚔复仇');
+    if (u.starfall && u.starfall.length > 0) buffs.push('🌠星降x' + u.starfall.length);
+    if (u.forgottenTurns > 0) buffs.push('❓遗忘x' + u.forgottenTurns);
+    if (u.id === '403') { if (u.shift) buffs.push('🌑回归' + u.ret + '/10'); else if (u.dis > 0) buffs.push('🌑恶兆' + u.dis + '/5'); }
+    if (u.id === '404' && u.chargeStacks > 0) buffs.push('🔥蓄' + u.chargeStacks);
+    
+    var card = document.createElement('div');
+    var isGolden = (u.id === 'F01' && u.isNavigator);
+    var starClass = 'star-' + (CHARS[u.id].s || 1);
+    
+    // 如果是启航者，加上特写样式和居中布局
+    card.className = 'card-v2 ' + (u.team === 0 ? 'ally' : 'enemy') + ' ' + (u.alive ? '' : 'dead') + ' ' + (isAct ? 'act' : '') + ' ' + starClass;
+    if (isGolden) card.classList.add('navigator');
+    
+    var energyReq = 100;
+    if (u.id === '305') energyReq = 80;
+    if (u.id === '405') energyReq = 180;
+    if (u.id === '303') energyReq = 360;
+    if (u.id === 'F05') energyReq = 80;
+    if (u.id === 'Fate01') energyReq = 100;
+    
+    if (u.energy >= energyReq && !isGolden && u.alive) {
+        card.classList.add('energy-full');
+    }
+    if (u.forgottenTurns > 0) card.style.opacity = '0.4';
+    
+    var buffsHtml = '';
+    for (var b=0; b<buffs.length; b++) buffsHtml += '<div class="buff-tag">' + buffs[b] + '</div>';
+    
+    card.innerHTML = 
+        '<div class="card-portrait">' + u.i + '</div>' +
+        '<div class="card-title">' + u.n + '</div>' +
+        '<div class="card-buffs-v2">' + buffsHtml + '</div>' +
+        '<div class="card-bottom">' +
+            '<div class="card-hp-bar"><div class="card-hp-fill" style="width:' + hpPct + '%"></div></div>' +
+            '<div class="card-hp-text">' + Math.max(0, u.hp) + '/' + u.maxHp + '</div>' +
+            '<div class="card-stats"><span class="card-atk">⚔' + u.a + '</span><span class="card-spd">💨' + u.sp + '</span></div>' +
+        '</div>';
+        
+    (function(uid) { card.onclick = function() { clickCard(uid); }; })(u.uid);
+    if (u.team === 0) aRow.appendChild(card); else eRow.appendChild(card);
+  }
+  
+  var sim = [];
+  for (var i = 0; i < battleUnits.length; i++) {
+    if (battleUnits[i].alive) {
+      var u = battleUnits[i];
+      if (u.extraTurns > 0) sim.push({ u: u, av: -1 });
+      else if (u.sp > 0) sim.push({ u: u, av: u.av });
+    }
+  }
+  var tl = document.getElementById('timeline');
+  tl.innerHTML = '';
+  if (sim.length > 0) {
+    sim.sort(function(a, b) { return a.av - b.av; });
+    for (var k = 0; k < Math.min(10, sim.length); k++) {
+      var item = document.createElement('div');
+      var colorCls = sim[k].u.team === 0 ? 'ally' : 'enemy';
+      item.className = 'tl-item ' + colorCls + (k === 0 ? ' now' : '');
+      var avText = sim[k].av < 0 ? '额外' : sim[k].av.toFixed(0);
+      item.innerHTML = '<span>' + sim[k].u.i + '</span><span style="font-size:10px;color:#aaa;">' + avText + '</span>';
+      tl.appendChild(item);
+      var step = sim[k].av;
+      if (step < 0) step = 0;
+      for (var m=0; m<sim.length; m++) sim[m].av -= step;
+      sim[k].av = baseAv / sim[k].u.sp;
+    }
+  }
+}
+
+function checkDesperate() {
+  var alive0 = [], alive1 = [];
+  for (var i = 0; i < battleUnits.length; i++) {
+    if (battleUnits[i].alive) { if (battleUnits[i].team === 0) alive0.push(battleUnits[i]); else alive1.push(battleUnits[i]); }
+  }
+  if (alive0.length === 1 && !alive0[0].desperate) {
+    var u = alive0[0];
+    if (u.a === 0 || u.sp === 0) { u.desperate = true; u.sp = 60; u.av = Math.min(u.av, baseAv / 60); logMsg('▸ 我方仅剩【' + u.n + '】且失去战斗能力，获得【垂死挣扎】！'); }
+  }
+  if (alive1.length === 1 && !alive1[0].desperate) {
+    var u = alive1[0];
+    if (u.a === 0 || u.sp === 0) { u.desperate = true; u.sp = 60; u.av = Math.min(u.av, baseAv / 60); logMsg('▸ 敌方仅剩【' + u.n + '】且失去战斗能力，获得【垂死挣扎】！'); }
+  }
+}
+
+function nextTurn() {
+  if (battleOver) return;
+  var alive = [];
+  for (var i = 0; i < battleUnits.length; i++) if (battleUnits[i].alive) alive.push(battleUnits[i]);
+  if (alive.length === 0) return;
+  checkDesperate();
+  var a = null;
+  currentIsExtra = false;
+  for (var i = 0; i < alive.length; i++) {
+    if (alive[i].extraTurns > 0) { a = alive[i]; a.extraTurns--; currentIsExtra = true; break; }
+  }
+  if (!a) {
+    alive.sort(function(x, y) { return x.av - y.av; });
+    a = alive[0];
+    if (a.sp === 0 && a.id === 'F05' && !a.isTransformed) { a.av = 999999; setTimeout(nextTurn, 100 / gameSpeed); return; }
+    var step = a.av;
+    if (isNaN(step) || step === undefined) step = 0;
+    for (var j = 0; j < alive.length; j++) alive[j].av -= step;
+    if (a.sp > 0) a.av = baseAv / a.sp; else a.av = 999999;
+    for (var i = 0; i < battleUnits.length; i++) {
+      var u = battleUnits[i];
+      if (u.id === 'F02') { if (u.yuTurns > 0) u.yuTurns--; if (u.windSand > 0) u.windSand--; }
+    }
+    if (a.pierceTurns > 0) {
+      a.pierceTurns--;
+      if (a.pierceTurns === 0) {
+        a.maxHp -= a.buffHp; a.hp = Math.min(a.hp, a.maxHp); a.a -= a.buffAtk; a.sp -= a.buffSp; a.baseSp -= a.buffSp;
+        a.pierceShield = 0; a.buffHp = 0; a.buffAtk = 0; a.buffSp = 0;
+        logMsg('▸ 【' + a.n + '】的【寒动泄雪】增益持续3回合后到期，属性恢复。');
+      }
+    }
+  }
+  
+  for (var i = 0; i < battleUnits.length; i++) {
+    var u = battleUnits[i];
+    if (u.starfall && u.starfall.length > 0) {
+      for (var k = u.starfall.length - 1; k >= 0; k--) {
+        u.starfall[k]--;
+        if (u.starfall[k] <= 0) u.starfall.splice(k, 1);
+      }
+    }
+    if (u.extraHpLayers) {
+        for (var j = u.extraHpLayers.length - 1; j >= 0; j--) {
+            u.extraHpLayers[j].turns--;
+            if (u.extraHpLayers[j].turns <= 0) {
+                u.extraHp -= u.extraHpLayers[j].val;
+                if(u.extraHp < 0) u.extraHp = 0;
+                u.extraHpLayers.splice(j, 1);
+                logMsg('▸ 【' + u.n + '】的一层时间加护额外生命到期。');
+            }
+        }
+    }
+  }
+
+  if (a.forgottenTurns > 0 && !currentIsExtra) {
+    a.forgottenTurns--;
+    logMsg('▸ 【' + a.n + '】处于【Forgotten】状态，无法行动！(剩余' + a.forgottenTurns + '回合)');
+    renderBattle(); setTimeout(nextTurn, 500 / gameSpeed); return;
+  }
+
+  if (a.stunTurns > 0) {
+    a.stunTurns--;
+    logMsg('▸ 【' + a.n + '】被禁止行动！(剩余次数: ' + a.stunTurns + ')');
+    renderBattle(); setTimeout(nextTurn, 500 / gameSpeed); return;
+  }
+  if (a.team === 0 && !currentIsExtra) {
+    for (var i = 0; i < battleUnits.length; i++) {
+      if (battleUnits[i].markForClear) {
+        if (battleUnits[i].extraHp > 0) logMsg('▸ 我方新的常规行动开始，【' + battleUnits[i].n + '】的额外生命移除。');
+        battleUnits[i].extraHp = 0; battleUnits[i].markForClear = false;
+      }
+    }
+  }
+  currentActorUid = a.uid;
+  a.atkCountThisTurn = 0; a.hasProjectedThisTurn = false;
+  renderBattle();
+  logMsg('【' + a.n + '】行动' + (currentIsExtra ? ' (额外回合)' : ''));
+  if (a.mark > 0) {
+    var src102 = null;
+    for (var k = 0; k < battleUnits.length; k++) {
+      if (battleUnits[k].id === '102' && battleUnits[k].alive && battleUnits[k].team !== a.team) { src102 = battleUnits[k]; break; }
+    }
+    var markDmg = 40 * Math.min(2, a.mark);
+    if (src102) dealDamage(src102, a, markDmg);
+    else {
+      a.hp -= markDmg;
+      logMsg('▸ 【猎杀印记】发作，【' + a.n + '】受到 ' + markDmg + ' 点伤害。');
+      if (a.hp <= 0) { a.hp = 0; a.alive = false; logMsg('▸ 【' + a.n + '】被击倒！'); }
+    }
+    a.markT--;
+    if (a.markT <= 0) { a.mark = 0; a.markT = 0; }
+    renderBattle();
+  }
+  if (!a.alive) { setTimeout(nextTurn, 500 / gameSpeed); return; }
+  if (!currentIsExtra) {
+    for (var i = 0; i < battleUnits.length; i++) {
+      var u = battleUnits[i];
+      if (u.id === 'F03' && u.alive && u.team === a.team && u !== a) {
+        u.extraTurns += 1; 
+        if(!a.extraHpLayers) a.extraHpLayers = [];
+        a.extraHpLayers.push({ val: 20, turns: 4 });
+        a.extraHp += 20; 
+        a.markForClear = true;
+        logMsg('▸ 【时间领主】触发！赋予【' + a.n + '】20额外生命，并获得额外回合。'); break;
+      }
+    }
+  }
+  if (a.team === 0 && !isAuto) showPlayerPanel(a, currentIsExtra);
+  else { document.getElementById('actionPanel').style.display = 'none'; setTimeout(function() { aiAction(a); }, 600 / gameSpeed); }
+}
+
+function showPlayerPanel(a, isExtra) {
+  document.getElementById('actionPanel').style.display = 'block';
+  var energyReq = 100;
+  if (a.id === '305') energyReq = 80;
+  if (a.id === '405') energyReq = 180;
+  if (a.id === '303') energyReq = 360;
+  if (a.id === 'F05') energyReq = 80;
+  if (a.id === 'Fate01') energyReq = 100;
+  
+  document.getElementById('actionTitle').innerText = '轮到【' + a.n + '】行动' + (isExtra ? ' (额外回合)' : '') + ' (能量:' + Math.floor(a.energy) + '/' + energyReq + ')';
+  var btnAtk = document.getElementById('btnAtk'), btnProj = document.getElementById('btnProj'), btnSkl = document.getElementById('btnSkl'), btnEnd = document.getElementById('btnEnd');
+  if (a.desperate) {
+    btnAtk.innerText = '垂死挣扎'; btnAtk.style.display = 'inline-block'; btnProj.style.display = 'none'; btnSkl.disabled = true; btnEnd.style.display = 'none';
+  } else if (a.id === 'Fate01') {
+    btnSkl.disabled = a.energy < 100; btnSkl.innerText = '技能: UBW'; btnEnd.style.display = 'block'; btnEnd.innerText = '结束回合';
+    if (a.hasProjectedThisTurn) {
+      btnAtk.style.display = 'none'; btnProj.style.display = 'block'; btnProj.innerText = '继续投影 (剩余' + a.projection + ')'; btnProj.disabled = (a.projection <= 0 || a.atkCountThisTurn >= 6);
+    } else {
+      btnAtk.style.display = 'inline-block'; btnAtk.innerText = '普攻 (回1投影)'; btnProj.style.display = 'block'; btnProj.innerText = '投影魔术 (耗1, A60)'; btnProj.disabled = (a.projection <= 0);
+    }
+  } else {
+    btnAtk.innerText = '普攻'; btnAtk.style.display = 'inline-block'; btnProj.style.display = 'none'; btnSkl.disabled = a.energy < energyReq; btnEnd.style.display = 'block'; btnEnd.innerText = '待机';
+    if (a.disasterSkill) btnSkl.innerText = '技能: 灭灾';
+    else if (a.id === 'F06' && a.absorbedSkill) btnSkl.innerText = '技能: 吸收的【' + CHARS[a.absorbedSkill].sk + '】';
+    else if (a.id === 'F01' && a.isNavigator) btnSkl.innerText = '技能: 崭新的世界本源';
+    else if (a.id === '205') btnSkl.innerText = '技能: 庇护之雪'; 
+    else btnSkl.innerText = '技能: ' + CHARS[a.id].sk;
+  }
+}
+
+function toggleAuto() {
+  isAuto = !isAuto;
+  logMsg(isAuto ? '已切换为自动战斗' : '已取消自动战斗');
+  updateAutoBtn();
+  var a = null;
+  for (var i = 0; i < battleUnits.length; i++) if (battleUnits[i].uid === currentActorUid) a = battleUnits[i];
+  if (isAuto) { document.getElementById('actionPanel').style.display = 'none'; if (a && a.team === 0) aiAction(a); }
+  else { if (a && a.team === 0 && !battleOver) showPlayerPanel(a, currentIsExtra); }
+}
+
+function updateAutoBtn() {
+  var btn = document.getElementById('btnAuto');
+  btn.innerText = isAuto ? '取消自动' : '开启自动';
+  btn.className = isAuto ? 'btn on' : 'btn';
+  btn.style.padding = '4px 10px'; btn.style.fontSize = '12px';
+}
+
+function cycleSpeed() {
+  if (gameSpeed === 1) gameSpeed = 2; else if (gameSpeed === 2) gameSpeed = 3; else gameSpeed = 1;
+  document.getElementById('btnSpeed').innerText = '倍速: ' + gameSpeed + 'x';
+}
+
+function clickCard(uid) {
+  var target = null;
+  for (var i = 0; i < battleUnits.length; i++) if (battleUnits[i].uid === uid) target = battleUnits[i];
+  if (!target) return;
+  var actor = null;
+  for (var i = 0; i < battleUnits.length; i++) if (battleUnits[i].uid === currentActorUid) actor = battleUnits[i];
+  if (needTargetType && actor) {
+    if (needTargetType === 'ally_atk' || needTargetType === 'ally_skl') {
+      if (target.team === actor.team && target.uid !== actor.uid && target.alive) {
+        var type = needTargetType; needTargetType = null; document.getElementById('actionPanel').style.display = 'none';
+        if (type === 'ally_atk') doAttack(actor, target); else doSkill(actor, target);
+      } else alert('必须选择除自己外的我方存活角色！');
+    } else if (needTargetType === 'any_skl') {
+      if (target.alive) {
+        var type = needTargetType; needTargetType = null; document.getElementById('actionPanel').style.display = 'none';
+        doSkill(actor, target);
+      } else alert('请选择存活角色！');
+    } else if (target.team !== actor.team && target.alive) {
+      var type = needTargetType; needTargetType = null; document.getElementById('actionPanel').style.display = 'none';
+      if (type === 'atk') doAttack(actor, target); else if (type === 'proj') doProj(actor, target); else doSkill(actor, target);
+    } else alert('请选择敌方角色！');
+  } else showInfo(target.id, target);
+}
+
+function playerAtk() {
+  var a = null;
+  for (var i = 0; i < battleUnits.length; i++) if (battleUnits[i].uid === currentActorUid) a = battleUnits[i];
+  if (a.desperate) { document.getElementById('actionPanel').style.display = 'none'; doAttack(a, null); return; }
+  if (a.id === '205') { needTargetType = 'ally_atk'; document.getElementById('actionTitle').innerText = '请点击我方卡片选择辅助目标'; }
+  else { needTargetType = 'atk'; document.getElementById('actionTitle').innerText = '请点击上方敌方卡片选择目标'; }
+  document.getElementById('actionPanel').style.display = 'none'; 
+}
+
+function playerProj() {
+  var a = null;
+  for (var i = 0; i < battleUnits.length; i++) if (battleUnits[i].uid === currentActorUid) a = battleUnits[i];
+  if (a.projection <= 0) { alert('没有【投影魔术】能量！'); return; }
+  if (a.atkCountThisTurn >= 6) { alert('本回合攻击已达6次上限！'); return; }
+  needTargetType = 'proj';
+  document.getElementById('actionTitle').innerText = '请点击上方敌方卡片选择投影目标';
+  document.getElementById('actionPanel').style.display = 'none'; 
+}
+
+function playerSkl() {
+  var a = null;
+  for (var i = 0; i < battleUnits.length; i++) if (battleUnits[i].uid === currentActorUid) a = battleUnits[i];
+  var autoSkill = ['101', '301', '402', '104', '303', 'F02', 'F04', '205', '305', '405'];
+  var isAS = false;
+  if (a.id === 'F06') isAS = false; else if (a.id === 'Fate01') isAS = true; else if (a.disasterSkill) isAS = true;
+  else if (a.id === 'F01' && !a.isNavigator) isAS = true;
+  else if (a.id === 'F03') isAS = false; else for(var i=0; i<autoSkill.length; i++) if(autoSkill[i] === a.id) isAS = true;
+  if (isAS) { document.getElementById('actionPanel').style.display = 'none'; doSkill(a, null); }
+  else {
+    if (a.id === 'F07') { needTargetType = 'any_skl'; document.getElementById('actionTitle').innerText = '请点击任意卡片选择【Forgotten】目标'; }
+    else if (a.id === 'F03') { needTargetType = 'ally_skl'; document.getElementById('actionTitle').innerText = '请点击我方卡片选择时间加护目标'; }
+    else { needTargetType = 'skl'; document.getElementById('actionTitle').innerText = '请点击上方敌方卡片选择目标'; }
+    document.getElementById('actionPanel').style.display = 'none';
+  }
+}
+
+function playerWait() {
+  document.getElementById('actionPanel').style.display = 'none';
+  var a = null;
+  for (var i = 0; i < battleUnits.length; i++) if (battleUnits[i].uid === currentActorUid) a = battleUnits[i];
+  afterAction(a);
+}
+
+function aiAction(a) {
+  if (!a.alive) { nextTurn(); return; }
+  if (a.desperate) { doAttack(a, null); return; }
+  if (a.id === '205') {
+    var allies = [];
+    for (var i = 0; i < battleUnits.length; i++) if (battleUnits[i].team === a.team && battleUnits[i].alive && battleUnits[i].uid !== a.uid) allies.push(battleUnits[i]);
+    if (allies.length > 0) { allies.sort(function(x, y) { return y.a - x.a; }); doAttack(a, allies[0]); } else afterAction(a);
+    return;
+  }
+  var enemies = [];
+  for (var i = 0; i < battleUnits.length; i++) if (battleUnits[i].team !== a.team && battleUnits[i].alive) enemies.push(battleUnits[i]);
+  if (enemies.length === 0) { nextTurn(); return; }
+  var target = enemies[Math.floor(Math.random() * enemies.length)];
+  var autoSkill = ['101', '301', '402', '104', '303', 'F02', 'F04', '205', '305', '405'];
+  var isAS = false;
+  if (a.id === 'Fate01') isAS = true; else if (a.disasterSkill) isAS = true; else for(var i=0; i<autoSkill.length; i++) if(autoSkill[i] === a.id) isAS = true;
+  
+  var energyReq = 100;
+  if (a.id === '305') energyReq = 80;
+  if (a.id === '405') energyReq = 180;
+  if (a.id === '303') energyReq = 360;
+  if (a.id === 'F05') energyReq = 80;
+  if (a.id === 'Fate01') energyReq = 100;
+  
+  if (a.energy >= energyReq && a.id !== '205') { // 205自动释放，不走这里
+    if (isAS) doSkill(a, null);
+    else if (a.id === 'F03') {
+      var allies = [];
+      for (var i=0; i<battleUnits.length; i++) if(battleUnits[i].team===a.team && battleUnits[i].alive && battleUnits[i]!==a) allies.push(battleUnits[i]);
+      if (allies.length > 0) doSkill(a, allies[0]); else afterAction(a);
+    }
+    else if (a.id === 'F07') {
+      var aliveTargets = [];
+      for (var i=0; i<battleUnits.length; i++) if(battleUnits[i].alive && battleUnits[i].forgottenTurns <= 0) aliveTargets.push(battleUnits[i]);
+      if (aliveTargets.length > 0) doSkill(a, aliveTargets[Math.floor(Math.random() * aliveTargets.length)]); 
+      else afterAction(a);
+    }
+    else doSkill(a, target);
+    return;
+  }
+  if (a.id === 'Fate01') {
+    if (!a.hasProjectedThisTurn && a.projection > 0 && a.atkCountThisTurn < 6) doProj(a, target);
+    else if (a.hasProjectedThisTurn && a.projection > 0 && a.atkCountThisTurn < 6) doProj(a, target);
+    else doAttack(a, target);
+  } else doAttack(a, target);
+}
+
+function doAttack(a, t) {
+  if (a.desperate) {
+    var selfDmg = Math.floor(a.hp * 0.1); a.hp = Math.max(1, a.hp - selfDmg);
+    logMsg('▸ 【' + a.n + '】释放【垂死挣扎】，扣除当前生命值10%(' + selfDmg + ')，对敌方全体造成15伤害。');
+    var enemies = [];
+    for (var i = 0; i < battleUnits.length; i++) if (battleUnits[i].team !== a.team && battleUnits[i].alive) enemies.push(battleUnits[i]);
+    for (var i = 0; i < enemies.length; i++) dealDamage(a, enemies[i], 15);
+    a.energy = Math.min(a.energyMax, a.energy + 20); renderBattle(); afterAction(a); return;
+  }
+  if (a.id === 'Fate01') {
+    a.atkCountThisTurn++; a.projection = Math.min(6, a.projection + 1); 
+    logMsg('▸ 【' + a.n + '】进行普通攻击，造成45伤害并回复1点【投影魔术】。');
+    dealDamage(a, t, a.a); a.energy = Math.min(a.energyMax, a.energy + 20); 
+    renderBattle();
+    if (checkWin()) return;
+    afterAction(a); return;
+  }
+  if (a.id === '205') {
+    // 只能同时对1人生效
+    for (var i=0; i<battleUnits.length; i++) {
+        if (battleUnits[i].pierceTurns > 0) battleUnits[i].pierceTurns = 0; // 清空其他人的
+    }
+    t.av = Math.floor(t.av * 0.5);
+    var addHp = Math.floor(t.maxHp * 0.1), addAtk = Math.floor(t.a * 0.1), addSp = Math.floor(t.sp * 0.1);
+    t.maxHp += addHp; t.hp += addHp; t.a += addAtk; t.sp += addSp; t.baseSp += addSp;
+    t.buffHp = (t.buffHp || 0) + addHp; t.buffAtk = (t.buffAtk || 0) + addAtk; t.buffSp = (t.buffSp || 0) + addSp;
+    t.pierceShield = 0.36; t.pierceTurns = 3;
+    logMsg('▸ 【' + a.n + '】辅助了【' + t.n + '】，使其行动提前50%，全属性提升，获得36%护盾穿透（持续3回合）。');
+    a.energy = Math.min(a.energyMax, a.energy + 20); renderBattle(); afterAction(a); return;
+  }
+  var dmg = a.a;
+  if (a.weakenNext > 0) { dmg = Math.floor(dmg * (1 - a.weakenNext)); logMsg('▸ 【' + a.n + '】被【示范重演】削弱，本次攻击伤害降低20%。'); a.weakenNext = 0; }
+  if (a.id === '203') { var lost203 = a.maxHp - a.hp; if (lost203 > 0) { var bonus203 = Math.floor(lost203 / 50) * 10; if (bonus203 > 0) { dmg += bonus203; logMsg('▸ 事故累积：额外+' + bonus203 + '伤害。'); } } }
+  if (a.id === '301' && t.hp < t.maxHp * 0.5) { dmg *= 2; a.hp = Math.max(1, a.hp - 3); logMsg('▸ 龚蜂猎残：伤害翻倍，自身-3HP'); }
+  if (a.id === '402' && Math.random() < 0.5) { dmg += 50; logMsg('▸ 狱扇触发额外50伤害！'); }
+  if (a.id === '304' && Math.random() < 0.5) { dmg += 10; a.hp = Math.min(a.maxHp, a.hp + 10); }
+  if (a.id === 'F02' && a.yuTurns > 0) dmg = Math.floor(dmg * 1.6);
+  dealDamage(a, t, dmg); a.energy = Math.min(a.energyMax, a.energy + 20);
+  if (a.id === '102' && a.alive && t.alive) { t.mark = Math.min(2, t.mark + 1); t.markT = 2; }
+  if (a.id === '404' && a.chargeStacks > 0 && t.alive) {
+    var extra404 = a.chargeStacks * 30;
+    var canDeal404 = Math.max(0, Math.min(extra404, t.hp - 1));
+    if (canDeal404 > 0) { logMsg('▸ 祝杨之火蓄势：额外造成 ' + canDeal404 + ' 伤害（不致死）。'); dealDamage(a, t, canDeal404); }
+  }
+  if (a.id === '403') addOmen(a, 1);
+  if (a.id === 'F02') triggerYu(a);
+  if (a.id === 'F05' && a.isTransformed && a.alive) {
+    if (a.n.indexOf('病毒') >= 0) { a.virusDebuff = (a.virusDebuff || 0) + 5; logMsg('▸ 【最后的病毒感染者】副作用：自身受到的伤害提高' + a.virusDebuff + '点。'); }
+    else if (a.n.indexOf('丧尸') >= 0) { var selfDmg = Math.floor(a.maxHp * 0.08); a.hp -= selfDmg; logMsg('▸ 【智慧的丧尸者】副作用：扣除自身8%最大生命(' + selfDmg + ')'); if (a.hp <= 0) a.hp = 1; renderBattle(); }
+  }
+  afterAction(a);
+}
+
+function doProj(a, t) {
+  a.projection--; a.atkCountThisTurn++; a.hasProjectedThisTurn = true; 
+  logMsg('▸ 【' + a.n + '】消耗1点【投影魔术】，对【' + t.n + '】造成60伤害。(本回合第' + a.atkCountThisTurn + '次攻击)');
+  dealDamage(a, t, 60); a.energy = Math.min(a.energyMax, a.energy + 20); 
+  renderBattle();
+  if (checkWin()) return;
+  if (a.projection > 0 && a.alive && a.atkCountThisTurn < 6) {
+    if (a.team === 0 && !isAuto) { showPlayerPanel(a, currentIsExtra); document.getElementById('actionTitle').innerText = '【投影魔术】剩余 ' + a.projection + '，请继续或结束回合'; }
+    else setTimeout(function() { aiAction(a); }, 400 / gameSpeed);
+  } else {
+    if (a.projection === 0 && a.alive) logMsg('▸ 【' + a.n + '】投影魔术耗尽，回合结束。');
+    else if (a.atkCountThisTurn >= 6 && a.alive) logMsg('▸ 【' + a.n + '】本回合攻击已达6次上限，回合结束。');
+    afterAction(a);
+  }
+}
+
+function doSkill(a, t) {
+  if (a.id !== '405' && a.id !== 'Fate01') a.energy = 0; // Fate01 存储能量
+  if (a.disasterSkill) {
+    logMsg('【' + a.n + '】释放技能【灭灾】');
+    var bt = document.createElement('div'); bt.className = 'bigtext'; bt.innerText = '灭灾'; document.body.appendChild(bt); setTimeout(function() { bt.remove(); }, 1000 / gameSpeed);
+    var isOwnerSide = (a.team === a.disasterOwnerTeam); a.disasterSkill = false; 
+    if (isOwnerSide) { 
+      for (var i=0; i<battleUnits.length; i++) if (battleUnits[i].team === a.team && battleUnits[i].alive) battleUnits[i].hp = Math.min(battleUnits[i].maxHp, battleUnits[i].hp + 100);
+      logMsg('▸ 己方全体恢复100血量！');
+    } else { 
+      for (var i=0; i<battleUnits.length; i++) if (battleUnits[i].team === a.disasterOwnerTeam && battleUnits[i].alive) battleUnits[i].stunTurns += 2;
+      logMsg('▸ 刘子峻方全体被【禁止行动】2次！');
+    }
+    renderBattle(); afterAction(a); return;
+  }
+  var skId = a.id;
+  if (a.id === 'F06' && a.absorbedSkill) skId = a.absorbedSkill; 
+  logMsg('【' + a.n + '】释放技能【' + (a.id === 'F06' ? CHARS[skId].sk : (a.id==='F01' && a.isNavigator ? '崭新的世界本源' : CHARS[a.id].sk)) + '】');
+  var bt = document.createElement('div'); bt.className = 'bigtext'; bt.innerText = (a.id === 'F06' ? CHARS[skId].sk : (a.id==='F01' && a.isNavigator ? '崭新的世界本源' : CHARS[a.id].sk));
+  document.body.appendChild(bt); setTimeout(function() { bt.remove(); }, 1000 / gameSpeed);
+  var enemies = [], allies = [];
+  for (var i = 0; i < battleUnits.length; i++) {
+    if (!battleUnits[i].alive) continue;
+    if (battleUnits[i].team !== a.team) enemies.push(battleUnits[i]); else allies.push(battleUnits[i]);
+  }
+  
+  if (skId === 'Fate01') {
+    a.energy = Math.max(0, a.energy - 100); // 消耗100，存下来剩下的
+    a.projection = Math.min(6, a.projection + 2); a.extraTurns += 1;
+    logMsg('▸ 【' + a.n + '】获得2点【投影魔术】，并获得1个额外回合。');
+    for (var i = 0; i < enemies.length; i++) dealDamage(a, enemies[i], 100);
+  } else if (skId === '101') {
+    a.shield += 40;
+  } else if (skId === '301') {
+    for (var i = 0; i < enemies.length; i++) { var d = 15; if (enemies[i].hp < enemies[i].maxHp * 0.5) d *= 2; dealDamage(a, enemies[i], d); }
+  } else if (skId === 'F01') {
+    if (!a.isNavigator) { var shieldVal = Math.floor(a.maxHp * 0.3); a.shield += shieldVal; logMsg('▸ 杨帆获得 ' + shieldVal + ' 点护盾。'); }
+    else {
+      var decayMultiplier = Math.max(0.4, 1 - (a.navigatorDecay || 0)); a.navigatorDecay = (a.navigatorDecay || 0) + 0.15;
+      var enemyAliveCount = 0;
+      for(var e=0; e<battleUnits.length; e++) if(battleUnits[e].team !== a.team && battleUnits[e].alive) enemyAliveCount++;
+      var countMultiplier = 1.0;
+      if (enemyAliveCount === 5) countMultiplier = 1.35; else if (enemyAliveCount === 4) countMultiplier = 1.30; else if (enemyAliveCount === 3) countMultiplier = 1.20; else if (enemyAliveCount === 2) countMultiplier = 1.10; else if (enemyAliveCount === 1) countMultiplier = 1.00;
+      if (t) { var baseDmg1 = Math.floor(a.maxHp * 0.18) + Math.floor(a.a * 0.48); var dmg1 = Math.floor(baseDmg1 * decayMultiplier * countMultiplier); dealDamage(a, t, dmg1); }
+      for (var i = 0; i < enemies.length; i++) if (enemies[i] !== t) { var baseDmg2 = Math.floor(a.maxHp * 0.10) + Math.floor(a.a * 0.28); var dmg2 = Math.floor(baseDmg2 * decayMultiplier * countMultiplier); dealDamage(a, enemies[i], dmg2); }
+    }
+  } else if (skId === 'F02') {
+    var tgtF02 = t;
+    if (!tgtF02 && enemies.length > 0) tgtF02 = enemies[Math.floor(Math.random() * enemies.length)];
+    if (tgtF02) { var randDmg = Math.floor(Math.random() * 51) + 50; dealDamage(a, tgtF02, randDmg); }
+    triggerYu(a);
+  } else if (skId === 'F03') {
+    if (t) { 
+        t.extraTurns += 1; 
+        if(!t.extraHpLayers) t.extraHpLayers = [];
+        t.extraHpLayers.push({ val: 20, turns: 4 });
+        t.extraHp += 20; 
+        t.markForClear = true; 
+        logMsg('▸ 赋予【' + t.n + '】额外回合与20额外生命（叠加层数：' + t.extraHpLayers.length + '）'); 
+    }
+  } else if (skId === 'F04') {
+    for (var i = 0; i < enemies.length; i++) dealDamage(a, enemies[i], 360);
+  } else if (skId === 'F05') {
+    var target = null; enemies.sort(function(x, y) { return x.hp - y.hp; }); if (enemies.length > 0) target = enemies[0];
+    if (target) { var dmg = Math.floor((a.maxHp - a.hp) * 0.3); dealDamage(a, target, dmg); a.hp = Math.min(a.maxHp, a.hp + dmg); logMsg('▸ 阿希通过【绝望同化】回复了 ' + dmg + ' 生命值。'); }
+  } else if (skId === '303') {
+    for (var i = 0; i < allies.length; i++) allies[i].hp = Math.min(allies[i].maxHp, allies[i].hp + 40);
+    if (a.hp < a.maxHp * 0.5) a.hp = a.maxHp;
+  } else if (skId === 'F06') {
+    logMsg('▸ 【F06】目前没有可用的技能。');
+  } else if (skId === '102') {
+    if (t) { dealDamage(a, t, 40); if (t.alive) { t.mark = Math.min(2, t.mark + 2); t.markT = 2; logMsg('▸ 【枪猎标记】为【' + t.n + '】附加2层猎杀印记。'); } }
+  } else if (skId === '103') {
+    if (t) { dealDamage(a, t, 40); if (t.alive) { t.weakenNext = 0.2; logMsg('▸ 【示范重演】使【' + t.n + '】下次攻击伤害降低20%。'); } }
+    a.revenge = true; logMsg('▸ 【' + a.n + '】获得【复仇】，下次致死判定阈值提升至200%。');
+  } else if (skId === '104') {
+    for (var i = 0; i < enemies.length; i++) { dealDamage(a, enemies[i], 20); if (enemies[i].alive) enemies[i].av += 20; }
+    logMsg('▸ 【刺杨之风】使全体敌人行动值延后。');
+  } else if (skId === '105') {
+    if (t) { var d105 = Math.floor(a.hp * 0.15); dealDamage(a, t, d105); a.hp = Math.min(a.maxHp, a.hp + d105); logMsg('▸ 【水之涟漪】造成 ' + d105 + ' 伤害并回复等量生命。'); }
+  } else if (skId === '201') {
+    if (t) { dealDamage(a, t, 30); if (t.alive) { t.av += 30; logMsg('▸ 【踹飞】使【' + t.n + '】行动延后。'); } }
+  } else if (skId === '202') {
+    a.shield += 30;
+    if (t) dealDamage(a, t, 20);
+  } else if (skId === '203') {
+    var lost203 = a.maxHp - a.hp;
+    var dmg203 = Math.max(10, Math.min(200, Math.floor(lost203 * 0.5)));
+    if (t) dealDamage(a, t, dmg203);
+    var selfLoss = Math.floor(a.hp * 0.1);
+    a.hp = Math.max(1, a.hp - selfLoss);
+    logMsg('▸ 【事故重演】造成 ' + dmg203 + ' 伤害，自身损失 ' + selfLoss + ' 生命。');
+  } else if (skId === '204') {
+    if (t) { dealDamage(a, t, 50); if (t.alive) { t.av += 30; logMsg('▸ 【滉杨之水】使【' + t.n + '】行动延后。'); } }
+  } else if (skId === '205') {
+    // 自动释放不走这里，这里只是保底
+    for (var i = 0; i < allies.length; i++) allies[i].shield += 20;
+    logMsg('▸ 【庇护之雪】为我方全体提供20护盾。');
+  } else if (skId === '302') {
+    if (t) { var d302 = 60; if (a.hp > a.maxHp * 0.8) { d302 += 20; logMsg('▸ 【连刃斩】生命值高于80%，额外+20伤害。'); } dealDamage(a, t, d302); }
+  } else if (skId === '304') {
+    if (t) {
+      dealDamage(a, t, 30);
+      if (t.alive) {
+        var extra304 = 20;
+        if (t.hp - extra304 <= 0) extra304 = Math.max(0, t.hp - 1);
+        if (extra304 > 0) { dealDamage(a, t, extra304); logMsg('▸ 【震杨之雷】追加 ' + extra304 + ' 伤害（不致死）。'); }
+      }
+    }
+  } else if (skId === '305') {
+    for (var i = 0; i < enemies.length; i++) {
+      if (!enemies[i].starfall) enemies[i].starfall = [];
+      enemies[i].starfall.push(2);
+      logMsg('▸ 【星降】为【' + enemies[i].n + '】叠加了一层星降（受伤+3%）。');
+    }
+    a.extraTurns += 1;
+    logMsg('▸ 【' + a.n + '】释放星降后，获得了1个额外回合。');
+  } else if (skId === '401') {
+    a.shield += 40; a.halfDmgCount = 2;
+    logMsg('▸ 【厚壁坚守】获得40护盾，接下来2次受到伤害减半。');
+  } else if (skId === '402') {
+    for (var i = 0; i < enemies.length; i++) {
+      dealDamage(a, enemies[i], 30);
+      if (enemies[i].alive && Math.random() < 0.5) { dealDamage(a, enemies[i], 50); logMsg('▸ 【狱扇狂澜】对【' + enemies[i].n + '】追加50伤害！'); }
+    }
+  } else if (skId === '403') {
+    if (t) dealDamage(a, t, 70);
+    addOmen(a, 3);
+  } else if (skId === '404') {
+    if (t) dealDamage(a, t, 60);
+    var bonus404 = Math.min(150, a.chargeStacks * 30);
+    if (t && t.alive && bonus404 > 0) { dealDamage(a, t, bonus404); logMsg('▸ 【祝杨之火】蓄势释放：额外 ' + bonus404 + ' 伤害。'); }
+    logMsg('▸ 【404】蓄势层数清空。');
+    a.chargeStacks = 0;
+  } else if (skId === '405') {
+    a.energy = Math.max(0, a.energy - 180);
+    logMsg('▸ 【烈火燎原】触发！我方全体自动释放一次无消耗的主动技能！');
+    for (var i = 0; i < allies.length; i++) {
+      if (allies[i].alive && allies[i].uid !== a.uid) {
+        var tempE = allies[i].energy;
+        allies[i].energy = 100;
+        doSkill(allies[i], enemies[0] || null);
+        allies[i].energy = tempE;
+      }
+    }
+    for (var i = 0; i < allies.length; i++) {
+      allies[i].extraTurns += 1;
+    }
+    logMsg('▸ 【烈火燎原】后续：我方全体获得一个额外回合。');
+  } else if (skId === 'F07') {
+    if (t) {
+      var count = 0;
+      for (var i = 0; i < battleUnits.length; i++) if (battleUnits[i].forgottenTurns > 0) count++;
+      if (count < 2) {
+        t.forgottenTurns = 2;
+        logMsg('▸ 【Forgotten】使【' + t.n + '】进入遗忘状态，2回合内无法被命中，也无法攻击。');
+      } else {
+        logMsg('▸ 场上已有2人处于Forgotten状态，技能释放失败。');
+      }
+    }
+  } else { if (t) dealDamage(a, t, 60); }
+  
+  if (a.id === 'F05' && a.isTransformed && a.alive) {
+    if (a.n.indexOf('病毒') >= 0) { a.virusDebuff = (a.virusDebuff || 0) + 5; logMsg('▸ 【最后的病毒感染者】副作用：自身受到的伤害提高' + a.virusDebuff + '点。'); }
+    else if (a.n.indexOf('丧尸') >= 0) { var selfDmg = Math.floor(a.maxHp * 0.08); a.hp -= selfDmg; logMsg('▸ 【智慧的丧尸者】副作用：扣除自身8%最大生命(' + selfDmg + ')'); if (a.hp <= 0) a.hp = 1; renderBattle(); }
+  }
+  afterAction(a);
+}
+
+function checkAutoSkills() {
+    for (var i = 0; i < battleUnits.length; i++) {
+        var u = battleUnits[i];
+        if (u.alive && u.id === '205' && u.energy >= 100) {
+            u.energy = 0;
+            logMsg('▸ 【' + u.n + '】无视回合限制，自动释放了【庇护之雪】！');
+            var bt = document.createElement('div'); bt.className = 'bigtext'; bt.innerText = '庇护之雪'; document.body.appendChild(bt); setTimeout(function() { bt.remove(); }, 1000 / gameSpeed);
+            for (var j = 0; j < battleUnits.length; j++) {
+                var ally = battleUnits[j];
+                if (ally.team === u.team && ally.alive) {
+                    ally.av = Math.floor(ally.av * 0.8); // 提前20%
+                    if (ally.pierceTurns > 0) { // 受寒动泄雪加成
+                        ally.av = Math.floor(ally.av * 0.6); // 额外提前40%
+                        logMsg('▸ 【' + ally.n + '】因【寒动泄雪】再次提前行动！');
+                    }
+                }
+            }
+            renderBattle();
+        }
+    }
+}
+
+function addOmen(u, n) {
+  if (!u || !u.alive || u.id !== '403') return;
+  if (u.shift) {
+    u.ret += n;
+    if (u.ret >= 10) {
+      u.ret = 0; u.shift = false; u.team = u.originTeam; u.n = '牛伯厚·恶兆预告';
+      u.extraTurns += 1;
+      logMsg('▸ 【牛伯厚·恶兆预告】积攒10点回归值，回归原阵营！');
+      renderBattle();
+    }
+  } else {
+    u.dis += n;
+    if (u.dis >= 5) {
+      u.dis = 0; u.shift = true; u.ret = 0; u.team = 1 - u.originTeam;
+      u.n = '恶兆之牛伯厚';
+      u.extraTurns += 1;
+      logMsg('▸ 【牛伯厚·恶兆预告】恶兆缠身，转移至' + (u.team === 0 ? '我方' : '敌方') + '阵营！');
+      renderBattle();
+    }
+  }
+}
+
+function triggerYu(a) {
+  var r = Math.random() * 100, star = 1;
+  if (r < 0.1) star = 4; else if (r < 11) star = 3; else if (r < 50) star = 2;
+  var names = {1:['普通之玉','歌之玉'], 2:['结界之玉','神奇之玉'], 3:['时间之玉','风沙之玉'], 4:['玉灵之玉']};
+  var yu = names[star][Math.floor(Math.random() * names[star].length)];
+  logMsg('▸ 【玉灵】获得 ' + star + '星 ' + yu + '！');
+  var enemies = [], allies = [];
+  for (var i = 0; i < battleUnits.length; i++) { if (!battleUnits[i].alive) continue; if (battleUnits[i].team !== a.team) enemies.push(battleUnits[i]); else allies.push(battleUnits[i]); }
+  if (yu === '普通之玉') { if (enemies.length) dealDamage(a, enemies[Math.floor(Math.random()*enemies.length)], 10); }
+  else if (yu === '歌之玉') { if (allies.length) { var t = allies[Math.floor(Math.random()*allies.length)]; t.hp = Math.min(t.maxHp, t.hp + 20); } }
+  else if (yu === '结界之玉') { for (var i = 0; i < allies.length; i++) allies[i].shield += 25; }
+  else if (yu === '神奇之玉') { a.yuTurns = 2; }
+  else if (yu === '时间之玉') { if (allies.length) allies[0].extraTurns += 1; }
+  else if (yu === '风沙之玉') { a.windSand = 2; }
+  else if (yu === '玉灵之玉') { for (var i = 0; i < allies.length; i++) allies[i].extraTurns += 2; a.yuTurns = 2; }
+}
+
+function afterAction(a) {
+  checkAutoSkills(); // 自动释放检测
+  
+  for (var i = 0; i < battleUnits.length; i++) {
+    var u404 = battleUnits[i];
+    if (u404.id === '404' && u404.alive && u404.team !== a.team) {
+      u404.chargeStacks = Math.min(5, u404.chargeStacks + 1);
+    }
+  }
+  for (var i = 0; i < battleUnits.length; i++) {
+    var f = battleUnits[i];
+    if (f.id === 'F01' && f.alive && !f.isNavigator) {
+      var aliveCount = 0;
+      for (var j = 0; j < battleUnits.length; j++) if (battleUnits[j].team === f.team && battleUnits[j].alive) aliveCount++;
+      if (aliveCount === 1) {
+        f.isNavigator = true; f.n = '伦海的启航者';
+        var bt = document.createElement('div'); bt.className = 'bigtext'; bt.innerText = '伦海的赐福'; document.body.appendChild(bt); setTimeout(function() { bt.remove(); }, 1500 / gameSpeed);
+        logMsg('▸ 【杨帆】触发了伦海的赐福，汲取了队伍所有角色的力量，成为【伦海的启航者】！');
+        logMsg('▸ 获得【失控的绝望】状态，受到伤害提高30%。');
+        if (f.teamOriginStats) {
+          f.teamOriginStats.sort(function(x,y){ return (x.maxHp + x.a*10 + x.sp*10) - (y.maxHp + y.a*10 + y.sp*10); }).reverse();
+          var rates = [0.8, 0.4, 0.2, 0.1, 0.05];
+          for (var k = 0; k < f.teamOriginStats.length; k++) { var rate = rates[k] || 0.02; f.maxHp += Math.floor(f.teamOriginStats[k].maxHp * rate); f.a += Math.floor(f.teamOriginStats[k].a * rate); f.sp += Math.floor(f.teamOriginStats[k].sp * rate); }
+        }
+        f.hp = f.maxHp; f.av = 0; logMsg('▸ 属性大幅提升，并立即行动！'); renderBattle(); 
+      }
+    }
+  }
+  if (a.id === 'F06' && a.alive) {
+    for (var i = 0; i < battleUnits.length; i++) if (battleUnits[i].disasterSkill) { battleUnits[i].disasterSkill = false; logMsg('▸ 【F06 刘子峻】重新吸取技能，【' + battleUnits[i].n + '】身上的【灭灾】被移除。'); }
+    var targets = [];
+    for (var i = 0; i < battleUnits.length; i++) if (battleUnits[i] !== a && battleUnits[i].alive) targets.push(battleUnits[i]);
+    if (targets.length > 0) {
+      var picked = targets[Math.floor(Math.random() * targets.length)]; a.absorbedSkill = picked.id; picked.disasterSkill = true; picked.disasterOwnerTeam = a.team; 
+      logMsg('▸ 【F06 刘子峻】随机吸收了【' + picked.n + '】的技能，并为其添加了【灭灾】！'); renderBattle();
+    }
+  }
+  if (a.id !== 'Fate01') {
+    for (var i = 0; i < battleUnits.length; i++) {
+      var u = battleUnits[i];
+      if (u.id === 'Fate01' && u.alive && u.team === a.team) { u.projection = Math.min(6, u.projection + 1); logMsg('▸ 【Archer】因队友行动，获得1点【投影魔术】。'); renderBattle(); }
+    }
+  }
+  renderBattle();
+  if (checkWin()) return;
+  setTimeout(nextTurn, (isAuto ? 400 : 600) / gameSpeed);
+}
+
+function dealDamage(s, t, amt) {
+  if (!t.alive || amt <= 0) return;
+  if (t.forgottenTurns > 0) {
+    logMsg('▸ 【' + t.n + '】处于遗忘状态，无法被命中！');
+    return;
+  }
+  if (s) lastAtkJudge = s.judge || 1;
+  if (t) lastDefJudge = t.judge || 1;
+  var d = amt;
+  if (t.starfall && t.starfall.length > 0) {
+    var mul = 1 + t.starfall.length * 0.03;
+    d = Math.floor(d * mul);
+    logMsg('▸ 星降易伤生效：伤害提高 ' + (t.starfall.length * 3) + '%。');
+  }
+  if (t.id === 'F01') { if (!t.isNavigator) d = Math.floor(d * 0.75); else d = Math.ceil(d * 1.3); }
+  if (t.id === 'F05' && t.hp - d <= 0 && !t.isTransformed) {
+    t.isTransformed = true;
+    var fCount = 0, nonFCount = 0;
+    for (var i = 0; i < battleUnits.length; i++) { var u = battleUnits[i]; if (u.team !== t.team && u.alive) { if (u.id.charAt(0) === 'F') fCount++; else nonFCount++; } }
+    if (fCount >= nonFCount) { t.n = '最后的病毒感染者'; t.maxHp = 820; t.hp = 820; t.a = 18; t.sp = 360; t.baseSp = 360; }
+    else { t.n = '智慧的丧尸者'; t.maxHp = 1000; t.hp = 1000; t.a = 25; t.sp = 240; t.baseSp = 240; }
+    t.av = baseAv / t.sp; logMsg('▸ 【阿希】生命归零，化身为【' + t.n + '】！'); renderBattle(); return; 
+  }
+  for (var i = 0; i < battleUnits.length; i++) {
+    var u = battleUnits[i];
+    if (u.id === 'F02' && u.alive && u.team === t.team && u.windSand > 0 && s.team !== t.team) { d = Math.floor(d * 0.2); t = u; logMsg('▸ 【风沙之玉】替队友承担伤害并减伤80%'); break; }
+  }
+  if (t.id === 'F05' && t.virusDebuff > 0) { d += t.virusDebuff; logMsg('▸ 【病毒感染者】易伤加成，受到伤害+' + t.virusDebuff); }
+  if (t.id === '204') d = Math.max(0, d - 20);
+  if (t.id === '202' && t.alive) { t.hp = Math.min(t.maxHp, t.hp + 10); logMsg('▸ 【202 王踹】先疗后伤，恢复了10点HP。'); }
+  if (t.halfDmgCount > 0) { d = Math.ceil(d * 0.5); t.halfDmgCount--; logMsg('▸ 【' + t.n + '】厚壁坚守减免，本次伤害减半（剩余减伤次数 ' + t.halfDmgCount + '）。'); }
+  if (t.id === '103' && t.hp - d <= 0 && t.alive) {
+    var threshold = t.revenge ? 2.0 : 1.5;
+    if (s.hp < t.hp * threshold) { t.hp = Math.min(t.maxHp, t.hp + 50); if (t.revenge) logMsg('▸ 【复仇】生效，致死判定阈值提升至200%。'); t.revenge = false; return; }
+    else { s.hp -= 80; if (s.hp <= 0) { s.hp = 0; s.alive = false; } }
+  }
+  if (t.id === '303' && t.save && t.hp - d <= 0) { t.save = false; t.hp = t.maxHp; logMsg('▸ 【爱心奇迹】触发！免疫致命伤害并回满生命。'); return; }
+  if (t.extraHp > 0) { 
+      var ab = Math.min(t.extraHp, d); 
+      t.extraHp -= ab; 
+      d -= ab; 
+      if (t.extraHpLayers) {
+          var rem = ab;
+          for (var k = 0; k < t.extraHpLayers.length; k++) {
+              var ded = Math.min(t.extraHpLayers[k].val, rem);
+              t.extraHpLayers[k].val -= ded;
+              rem -= ded;
+              if (t.extraHpLayers[k].val <= 0) {
+                  t.extraHpLayers.splice(k, 1);
+                  k--;
+              }
+          }
+      }
+      logMsg('▸ 【' + t.n + '】的额外生命抵挡了 ' + ab + ' 点伤害！'); 
+  }
+  var pierceDmg = 0, normalDmg = d;
+  if (s && s.pierceShield > 0) { pierceDmg = Math.floor(d * s.pierceShield); normalDmg = d - pierceDmg; }
+  if (t.shield > 0 && normalDmg > 0) { var ab = Math.min(t.shield, normalDmg); t.shield -= ab; normalDmg -= ab; if (ab > 0) logMsg('▸ 护盾抵挡了 ' + ab + ' 点伤害。'); }
+  var finalDmg = pierceDmg + normalDmg;
+  if (finalDmg > 0) {
+    t.hp -= finalDmg; logMsg('▸ 【' + s.n + '】对【' + t.n + '】造成 ' + finalDmg + ' 伤害' + (pierceDmg>0 ? ' (其中无视护盾:'+pierceDmg+')' : ''));
+    if (t.id === '201' && t.alive && s.alive) { var r = Math.ceil(finalDmg * 0.1); s.hp -= r; }
+  }
+  if (t.id === '105' && t.alive && finalDmg > 0) {
+    var healAmt = Math.floor(finalDmg * 0.75); var actualHeal = Math.min(t.maxHp - t.hp, healAmt);
+    t.hp += actualHeal; t.healTotal = (t.healTotal || 0) + actualHeal;
+    
+    var addHeal = Math.floor(finalDmg * 0.01);
+    var addAtk = Math.floor(finalDmg * 0.001); // 0.1%
+    if (addAtk < 1 && finalDmg > 0) addAtk = 1;
+    t.hp = Math.min(t.maxHp, t.hp + addHeal);
+    t.a += addAtk;
+    t.hitCount105 = (t.hitCount105 || 0) + 1;
+    
+    logMsg('▸ 【105 白四】受击回复了 ' + (actualHeal + addHeal) + ' 血量，攻击力+' + addAtk + '。(受击' + t.hitCount105 + '/15)');
+    if (t.healTotal >= 300 && !t.healTriggered) { t.healTriggered = true; t.extraTurns += 3; logMsg('▸ 【105 白四】累计回复达到300点，获得3个额外回合！'); }
+    if (t.hitCount105 >= 15) {
+        t.hitCount105 = 0;
+        t.extraTurns += 1;
+        logMsg('▸ 【105 白四】受击累计达15次，获得1个额外回合！');
+    }
+  }
+  if (t.id === '401' && t.alive && t.hp > 0 && t.hp < t.maxHp * 0.3 && !t.hasSurvived) {
+    t.hasSurvived = true; t.sp += 20; t.baseSp += 20; t.extraTurns += 1;
+    t.a = Math.floor(t.maxHp * 0.05);
+    logMsg('▸ 【401 牛伯厚】不屈之躯触发！速度+20，攻击力调整为最大生命5%，立即行动！');
+  }
+  if (t.hp <= 0) { t.hp = 0; t.alive = false; logMsg('▸ 【' + t.n + '】被击倒！'); }
+  if (s && s.hp <= 0) { s.hp = 0; s.alive = false; logMsg('▸ 【' + s.n + '】被击倒！'); }
+  if (t.hp <= 0 && t.id === 'F06') {
+    logMsg('▸ 【F06 刘子峻】阵亡，触发场上残留【灭灾】的结算！');
+    for (var i = 0; i < battleUnits.length; i++) {
+      var u = battleUnits[i];
+      if (u.alive && u.disasterSkill) {
+        u.disasterSkill = false;
+        if (u.team === u.disasterOwnerTeam) {
+          logMsg('▸ 【' + u.n + '】属于刘子峻方，刘子峻方全队恢复100生命！');
+          for (var k = 0; k < battleUnits.length; k++) if (battleUnits[k].team === u.team && battleUnits[k].alive) battleUnits[k].hp = Math.min(battleUnits[k].maxHp, battleUnits[k].hp + 100);
+        } else {
+          logMsg('▸ 【' + u.n + '】不属于刘子峻方，刘子峻方全体被【禁止行动】2次！');
+          for (var k = 0; k < battleUnits.length; k++) if (battleUnits[k].team === u.disasterOwnerTeam && battleUnits[k].alive) battleUnits[k].stunTurns += 2;
+        }
+      }
+    }
+  }
+  if (t.id === 'F04' && t.alive && t.hp < t.maxHp * 0.1 && !t.hasExploded) {
+    t.hasExploded = true; logMsg('▸ 【龙灵的终末曲】触发！邪塔迪拉安自爆！');
+    for (var i = 0; i < battleUnits.length; i++) {
+      var u = battleUnits[i];
+      if (u.alive && u.team !== t.team) dealDamage(t, u, 240);
+      if (u.alive && u.team === t.team) u.hp = Math.min(u.maxHp, u.hp + 60);
+    }
+    t.hp = 0; t.alive = false;
+  }
+  if (t.alive && t.id === '403') addOmen(t, 1);
+}
+
+function checkWin() {
+  var aA = false, eA = false;
+  for (var i = 0; i < battleUnits.length; i++) if (battleUnits[i].alive) { if (battleUnits[i].team === 0) aA = true; else eA = true; }
+  if (aA && eA) return false;
+  if (!aA && !eA) {
+    if (lastAtkJudge > lastDefJudge) {
+      logMsg('▸ 同时团灭！攻击方判定等级 ' + lastAtkJudge + ' > 被击方 ' + lastDefJudge + '，我方胜利！');
+      aA = true;
+    } else if (lastDefJudge > lastAtkJudge) {
+      logMsg('▸ 同时团灭！攻击方判定等级 ' + lastAtkJudge + ' < 被击方 ' + lastDefJudge + '，敌方胜利！');
+      eA = true;
+    } else {
+      logMsg('▸ 同时团灭且判定等级相同（' + lastAtkJudge + '级），平局！全员复活并回复10%生命。');
+      for (var i = 0; i < battleUnits.length; i++) {
+        var u = battleUnits[i];
+        u.alive = true; u.hp = Math.max(1, Math.floor(u.maxHp * 0.1));
+        u.av = u.sp > 0 ? baseAv / u.sp : 999999;
+        u.desperate = false;
+      }
+      renderBattle();
+      setTimeout(nextTurn, 900 / gameSpeed);
+      return false;
+    }
+  }
+  battleOver = true; document.getElementById('actionPanel').style.display = 'none';
+  var t = document.getElementById('overTitle');
+  if (eA) { 
+    t.innerText = '失败……'; t.className = 'lose'; 
+    playBgm('defeat');
+  } else { 
+    t.innerText = '胜利！'; t.className = ''; 
+    playBgm('victory');
+  }
+  document.getElementById('over').style.display = 'flex'; return true;
+}
+
+function logMsg(m) {
+  var l = document.getElementById('log'); var d = document.createElement('div');
+  d.innerText = '▸ ' + m; l.appendChild(d); l.scrollTop = l.scrollHeight;
+}
+
+initUI();
+</script>
+</body>
+</html>
